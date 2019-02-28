@@ -14,7 +14,7 @@ Micro Service 1: Ressource Gathering
 
 Methods         HTTP          Request        Description<br />
 
-getRessourceInfoGET         /ressources/          Return ressource info by ressource id<br />
+getRessourceInfo          GET         /ressources/          Return ressource info by ressource id<br />
 getDataFromRessource          GET         /ressources/data          Returns json data from the ressource that matches "data"<br />
 addRessourceInfo          POST          /ressources/          Insert ressource information (API Url and parameters needed for query) <br />
 ressourceUpdateInfo         PUT         /ressource/         Edit ressource profile or update ressource point<br />
