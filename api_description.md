@@ -29,5 +29,10 @@ Method : addRessourceInfo<br />
   list=search   //to get list of pages matching a criteria<br />
   srsearch=      //along with a page title to search for<br />
   format=jsonfm   //recommended format for output<br />
+  
+Method : getDataFromRessource       /ressource/data      data=John
+Queries wikipedia API for John
+http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=jsonfm
+
 
 
