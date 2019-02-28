@@ -10,11 +10,12 @@ API Description
 
 Micro Service 1: Ressource Gathering<br/>
 
-| Methods             | HTTP   Request    |            Description             |
-|---------------------|-------------------|------------------------------------|
-| getRessourceInfo    | GET /ressources/  | Return ressource info by ressource |
-| addRessourcerInfo   | POST /ressources/ | Insert ressource information       |
-| ressourceUpdateInfo | PUT /ressource/   | Edit ressource profile or update   |
+| Methods              | HTTP   Request       |            Description                  |
+|----------------------|----------------------|-----------------------------------------|
+| getRessourceInfo     | GET /ressources/     | Return ressource info by ressource id   |
+| getDataFromRessource | GET /ressources/data | return matching data from ressource API |
+| addRessourcerInfo    | POST /ressources/    | Insert ressource information            |
+| ressourceUpdateInfo  | PUT /ressource/      | Edit ressource profile or update        |
 
 Example: Adding wikipedia as ressource and getting information<br />
 
