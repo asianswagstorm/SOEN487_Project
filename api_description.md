@@ -8,16 +8,13 @@ API Description
 
 
 
-Micro Service 1: Ressource Gathering
+Micro Service 1: Ressource Gathering<br/>
 
-<pre>
-
-Methods         HTTP          Request        Description<br />
-
-getRessourceInfo          GET         /ressources/          Return ressource info by ressource id<br />
-getDataFromRessource          GET         /ressources/data          Returns json data from the ressource that matches "data"<br />
-addRessourceInfo          POST          /ressources/          Insert ressource information (API Url and parameters needed for query) <br />
-ressourceUpdateInfo         PUT         /ressource/         Edit ressource profile or update ressource point<br />
+| Methods             | HTTP   Request    |            Description             |
+|---------------------|-------------------|------------------------------------|
+| getRessourceInfo    | GET /ressources/  | Return ressource info by ressource |
+| addRessourcerInfo   | POST /ressources/ | Insert ressource information       |
+| ressourceUpdateInfo | PUT /ressource/   | Edit ressource profile or update   |
 
 Example: Adding wikipedia as ressource and getting information<br />
 
@@ -33,6 +30,7 @@ Method : addRessourceInfo<br />
 Method : getDataFromRessource       /ressource/data      data=John
 Queries wikipedia API for John
 http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=jsonfm
+
 
 
 
