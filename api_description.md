@@ -1,13 +1,5 @@
 API Description
 
-1) User Authentication Oauth2 with JWT
-
-
-
-
-
-
-
 Micro Service 1: Ressource Gathering<br/>
 
 | Methods              | HTTP   Request       |            Description                  |
@@ -33,5 +25,12 @@ Queries wikipedia API for John
 http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=jsonfm
 
 
+Micro Service 2: Authentication Oauth2 and JWT<br/>
 
+| Methods              | HTTP   Request       |            Description                  |
+|----------------------|----------------------|-----------------------------------------|
+| login                | POST /login          | Verify login credentials match info in db  |
+| register             | POST /register       | Adds the user to database along with a token |
+| logout               | - /logout            | Deletes the session and clear the token |
+| checkToken           | GET /login           | Check the tokens match                  |
 
