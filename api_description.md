@@ -15,7 +15,7 @@ Micro Service 1: Ressource Gathering<br/>
 | getRessourceInfo     | GET /ressources/     | Return ressource info by ressource id   |
 | getDataFromRessource | GET /ressources/data | return matching data from ressource API |
 | addRessourcerInfo    | POST /ressources/    | Insert ressource information            |
-| ressourceUpdateInfo  | PUT /ressource/      | Edit ressource profile or update        |
+| ressourceUpdateInfo  | PUT /ressource/      | Edit ressource profile         |
 
 Example: Adding wikipedia as ressource and getting information<br />
 
