@@ -56,39 +56,47 @@ http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=
 
 
 ## Technical Microservice Description:
-1. Resource Gathering Server
-Description:
-This microservice responds to HTTP requests describing a date and location. Given these parameters predetermined 3rd party APIs will be queried to generate a list of interesting information. Authenticated requests will signal to the service that the request was made by the caching system.
+#### 1. Resource Gathering Server
+- This microservice responds to HTTP requests describing a date and location. Given these parameters predetermined 3rd party APIs will be queried to generate a list of interesting information. Authenticated requests will signal to the service that the request was made by the caching system. 
 
 | Request | Response                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
-| GET /:Year/Month/Day?Location=Location         | 200 JSON                  | Formatted JSON response of 3rd party API data                 |
-| GET /:Year/Month/Day?Location=Location  (**Authenticated**)        | POST -> Cache Server           | Store processed 3rd party API data       |
+| GET /:Year/:Month/:Day?Location=Location         | 200 JSON                  | Formatted JSON response of 3rd party API data                 |
+| GET /:Year/:Month/:Day?Location=Location  (**Authenticated**)        | POST -> Cache Server           | Store processed 3rd party API data       |
 
-2. Data Persistance/Caching Server
-Description:
-The Caching Server describes the state of the persistant data retrieved from the Resource Server. Dates not present in the database are expected to be populated by the Resource Server.
+#### 2. Data Persistance/Caching Server
+- The Caching Server describes the state of the persistant data retrieved from the Resource Server. Dates not present in the database are expected to be populated by the Resource Server.
 
 | Request | Response                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
-| GET /:Year/Month/Day?Location=Location         | 200 JSON                  | Query of data in database                 |
+| GET /:Year/:Month/:Day?Location=Location         | 200 JSON                  | Query of data in database                 |
 | POST (**Authenticated**)        | 200 JSON, POST -> Application Server          |Response of successful data store, Signals newly saved| 
 
-3. Authentication Server
-This server verifies that certain requests are made by Application microservices. Authenticated requests will produce specific functions from the server.
+#### 3. Authentication Server
+- This server verifies that certain requests are made by Application microservices. Authenticated requests will produce specific functions from the server.
 
 | Request | Reponse                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
 | GET /getToken/:ServiceID        | 200 JSON                  | Gives microservice server unique token                 |
 | GET /authenticate/:ServiceID        | 200 JSON          |Validates service ID from token|
 
-4. Asynchronous Requests
-Description:
-This front-end microservice detects user interactions and creates background requests to continuously generate content for Client
+#### 4. Asynchronous Requests
+- This front-end microservice detects user interactions and creates background requests to continuously generate content for Client
 
 | Request | Reponse                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
-| GET /:Year/Month/Day?Location=Location&Pagination         | --                  | Makes background HTTP requests to Application Server                 |
+| GET /:Year/:Month/:Day?Location=Location&Pagination         | --                  | Makes background HTTP requests to Application Server                 |
+
+#### 5. Application Server
+- The hub that connects the user interface to the the 3rd Party API data.
+
+| Request | Reponse                       | Description                                      |
+|-------------|---------------------------|--------------------------------------------------|
+| GET /:Year/:Month/:Day?Location=Location&Pagination         | GET /:Year/Month/Day?Location=Location -> Cache Server 
+GET /:Year/Month/Day?Location=Location -> Resource Server
+| Checks Caching Server for date in data, Makes request to Resource Server for data
+| GET /cache/:Year/:Month/:Day            | -- | Validates date storage, adds to potential local mem list
+| POST /:Year/:Month/:Day            | 200 HTML | JSON 3rd API data (from Resource or Cache Server) applied to template view for client|
 
 
 ## Milestones
