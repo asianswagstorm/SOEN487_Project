@@ -1,16 +1,33 @@
 from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response
+from datetime import date
+from time import strftime
 from Jamdo.models import User
 from Jamdo import app , db, bcrypt
-import jwt , datetime
+
+import jwt , datetime,time
 @app.route('/', methods=['GET'])
 def root(): 
- 
+ today = str(date.today()) #yyyy-mm-dd
  if not session.get("username"):
   session["username"] = 0
   username = ""
  else:
   username = session["username"]
- return render_template('index.html', username=username) 
+ return render_template('index.html', username=username ,today=today) 
+
+@app.route('/', methods=['POST'])
+def returnData(): 
+ today = str(date.today()) 
+ date = request.form.get("date")
+ print(date)
+ #day=
+ #month=
+ #year=
+ if time.strptime(date, "%Y/%m/%d") > time.strptime(today, "%Y/%m/%d"):
+    return make_response(jsonify({'error' : "Date input cannot exceed today's date"}),404) 
+
+
+ return make_response(jsonify({'data' : "the data"}),200)
 
 @app.route('/login', methods=['GET', 'POST']) 
 def login():
