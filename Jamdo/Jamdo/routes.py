@@ -1,10 +1,21 @@
-from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response
+from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response,url_for
+from Jamdo.config import DevConfig
+from RessourceGathering.wiki_parsing import output_data
 from datetime import date
 from time import strftime
 from Jamdo.models import User
 from Jamdo import app , db, bcrypt
 
 import jwt , datetime,time
+
+url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
+      "&titles="
+URL = "https://en.wikipedia.org/w/api.php"
+
+monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+             7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
+
+
 @app.route('/', methods=['GET'])
 def root(): 
  today = str(date.today()) #yyyy-mm-dd
@@ -15,19 +26,87 @@ def root():
   username = session["username"]
  return render_template('index.html', username=username ,today=today) 
 
-@app.route('/', methods=['POST'])
-def returnData(): 
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
+@app.route('/getEvent', methods=['GET']) #Change the route please help me
+def return_event_day():
  today = str(date.today()) 
- date = request.form.get("date")
- print(date)
- #day=
- #month=
- #year=
- if time.strptime(date, "%Y/%m/%d") > time.strptime(today, "%Y/%m/%d"):
-    return make_response(jsonify({'error' : "Date input cannot exceed today's date"}),404) 
+ event_type = request.args.get("event_type")
+ 
+ type = 0
+ if event_type == "event":
+  type = 1
+ elif event_type == "birth":
+  type = 2
+ elif event_type == "death":
+  type = 3
+ else:
+  return make_response(jsonify({"code": 403, "msg": "There needs to be an event_type"}), 403)
+ 
+ request_date = request.args.get("date")
+ year=request_date.split("-")[0]
+ month= int(request_date.split("-")[1])
+ day= request_date.split("-")[2]
+
+ result = output_data(year, month, day, type)
+ result = output_data(year, month, day, type)
+ key = str(year) + " " + monthDict[month]+ " " + str(day)
+
+ if key in result:
+  return make_response(jsonify({key: result[key]}),200)
+ else:
+  return make_response(jsonify({"code": 403,
+                                "msg": "There is no information for that date"}), 403) 
+
+#YEAR AND MONTH ONLY
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
+@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
+def return_event_month(event_type, year, month):
+    location = request.args.get("location")
+    type = 0
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        type = 2
+    elif event_type == "death":
+        type = 3
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+    if not location:
+        result = output_data(year, month, 0, type)
+    result = output_data(year, month, 0, type)
+    return make_response(jsonify(result))
+
+#YEAR ONLY
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
+@app.route('/<string:event_type>/<year>/', methods={"GET"})
+def return_event_year(event_type, year):
+    location = request.args.get("location")
+    type = 0
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        type = 2
+    elif event_type == "death":
+        type = 3
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+    if not location:
+        result = output_data(year, 1, 0, type)
+    result = output_data(year, 1, 0, 1) ## for january
+    for i in range(2, 12):
+        nextMonth = output_data(year, i, 0, type)
+        ##print(nextMonth)
+        if nextMonth:
+            result.update(nextMonth)
+    return jsonify(result)
 
 
- return make_response(jsonify({'data' : "the data"}),200)
+
+
+
+
 
 @app.route('/login', methods=['GET', 'POST']) 
 def login():

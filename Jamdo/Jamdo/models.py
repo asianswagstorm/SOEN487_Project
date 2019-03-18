@@ -18,4 +18,13 @@ class User(db.Model):
     def __repr__(self):
         return f"User('{self.username}')"
 
+class API(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)
+    url = db.Column(db.String(20), nullable=False)
+    param = db.Column(db.String(40), nullable=False)
+
+    def __repr__(self):
+        return "<Person {}: {} {}>".format(self.id, self.name, self.url, self.param)
+
 db.create_all()
