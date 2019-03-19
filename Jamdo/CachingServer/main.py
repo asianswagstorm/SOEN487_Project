@@ -1,15 +1,14 @@
 from flask import Flask, jsonify, make_response, request
-# from config import DevConfig
-from sqlalchemy import exists
+from config import DevConfig
+
 import sqlalchemy
 
 
 # need an app before we import models because models need it
 app = Flask(__name__)
-from models import db, row2dict, Results
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///DB.sqlite'
+from models import db, row2dict, Result
 
-# app.config.from_object(DevConfig)
+app.config.from_object(DevConfig)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -21,20 +20,115 @@ def soen487_a1():
     return jsonify({"title": "SOEN487 Assignment 1",
                     "student": {"id": "26795234", "name": "Manuel Toca"}})
 
-@app.route("/", methods=["GET"])
-def get_year():
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
+@app.route('/<string:event_type>/<year>/<int:month>/<day>', methods={"GET"})
+def return_event_day(event_type, year, month, day):
+    location = request.args.get("location")
+    type = 0
+
+    if int(year) < 1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
+        type = 2
+    elif event_type == "death":
+        type = 3
+        if int(year) >= 2002:
+            type = 2
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+
+    if not location:
+        results = Result.query.filter_by(year=year, month=month, day=day, type=type).all()
+        if not results
+
+        return make_response(jsonify([row2dict(result) for result in results]))
+
+    results = Result.query.filter_by(year=year, month=month, day=day, location=location, type=type).all()
+    if not results
+
+    return make_response(jsonify([row2dict(result) for result in results]))
+
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
+@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
+def return_event_month(event_type, year, month):
+    location = request.args.get("location")
+    type = 0
+    if int(year) <1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
+        type = 2
+    elif event_type == "death":
+        type = 3
+        if int(year) >= 2002:
+            type = 2
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+    if not location:
+        results = Result.query.filter_by(year=year,month=month, type=type).all()
+        if not results
+
+        return make_response(jsonify([row2dict(result) for result in results]))
+
+    results = Result.query.filter_by(year=year, month=month, location=location, type=type).all()
+    if not results
+
+    return make_response(jsonify([row2dict(result) for result in results]))
+
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
+@app.route('/<string:event_type>/<year>/', methods={"GET"})
+def return_event_year(event_type, year):
+    location = request.args.get("location")
+    type = 0
+    if int(year) <1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
+        type = 2
+    elif event_type == "death":
+        type = 3
+        if int(year) >= 2002:
+            type = 2
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+
+    if not location:
+        results = Result.query.filter_by(year=year, type=type).all()
+        if not results
+
+        return make_response(jsonify([row2dict(result) for result in results]))
+
+    results = Result.query.filter_by(year=year, location=location, type=type).all()
+    if not results
+
+    return make_response(jsonify([row2dict(result) for result in results]))
+
 
 # @app.route("/person")
 # def get_all_person():
 #     person_list = Person.query.all()
-#     return jsonify([row2dict(person) for person in person_list])
-#
-#
-# @app.route("/person", methods=["DELETE"])
-# def delete_all_person():
-#     Person.query.delete()
-#     person_list = Person.query.all()
-#     db.session.commit()
 #     return jsonify([row2dict(person) for person in person_list])
 #
 #
@@ -44,17 +138,6 @@ def get_year():
 #     person = Person.query.filter_by(id=person_id).first()
 #     if person:
 #         return jsonify(row2dict(person))
-#     else:
-#         return make_response(jsonify({"code": 404, "msg": "Cannot find this person id."}), 404)
-#
-#
-# @app.route("/person/<person_id>", methods=["DELETE"])
-# def delete_person_by_id(person_id):
-#     person = Person.query.filter_by(id=person_id).first()
-#     if person:
-#         Person.query.filter_by(id=person_id).delete()
-#         db.session.commit()
-#         return jsonify({"code": 200, "msg": "success"})
 #     else:
 #         return make_response(jsonify({"code": 404, "msg": "Cannot find this person id."}), 404)
 #
@@ -77,135 +160,59 @@ def get_year():
 #         db.session.commit()
 #     except sqlalchemy.exc.SQLAlchemyError as e:
 #         error = "Cannot put person. "
-#         print(app.config.get("DEBUG"))
+#         # print(app.config.get("DEBUG"))
 #         if app.config.get("DEBUG"):
 #             error += str(e)
 #         return make_response(jsonify({"code": 404, "msg": error}), 404)
 #     return jsonify({"code": 200, "msg": "success"})
 #
 #
-# @app.route("/post")
-# def get_all_posts():
-#     post_list = Post.query.all()
-#     return jsonify([row2dict(post) for post in post_list])
+# @app.route("/person", methods={"POST"})
+# def post_person():
+#     # get the name first, if no name then fail
+#     name = request.form.get("name")
+#     if not name:
+#         return make_response(jsonify({"code": 403,
+#                                       "msg": "Cannot post person. Missing mandatory fields."}), 403)
+#
+#     person_id = request.form.get("id")
+#     if not person_id:
+#         p = Person(name=name)
+#         db.session.add(p)
+#     else:
+#         # id is a primary key, so we'll have max 1 result row
+#         person = Person.query.filter_by(id=person_id).first()
+#         if person:
+#             person.name = name
+#         else:
+#             p = Person(id=person_id, name=name)
+#             db.session.add(p)
+#
+#     try:
+#         db.session.commit()
+#     except sqlalchemy.exc.SQLAlchemyError as e:
+#         error = "Cannot post person. "
+#         # print(app.config.get("DEBUG"))
+#         if app.config.get("DEBUG"):
+#             error += str(e)
+#         return make_response(jsonify({"code": 404, "msg": error}), 404)
+#     return jsonify({"code": 200, "msg": "success"})
 #
 #
-# @app.route("/post", methods=["DELETE"])
-# def delete_all_post():
-#     Post.query.delete()
-#     post_list = Post.query.all()
-#     db.session.commit()
-#     return jsonify([row2dict(post) for post in post_list])
-#
-#
-# @app.route("/post/<post_id>")
-# def get_post(post_id):
+# @app.route("/person/<person_id>", methods={"DELETE"})
+# def delete_person(person_id):
 #     # id is a primary key, so we'll have max 1 result row
-#     post = Post.query.filter_by(post_id=post_id).first()
-#     if post:
-#         return jsonify(row2dict(post))
-#
-#
-# @app.route("/post/<post_id>", methods=["DELETE"])
-# def delete_post_by_id(post_id):
-#     post_exists = db.session.query(db.exists().where(Post.post_id == post_id)).scalar()
-#     if not post_exists:
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Post does not exist."}), 403)
-#     post = Post.query.filter_by(post_id=post_id).first()
-#     if post:
-#         Post.query.filter_by(post_id=post_id).delete()
-#         Comment.query.filter_by(post_id=post_id).delete()
-#         db.session.commit()
-#         return jsonify({"code": 200, "msg": "success"})
+#     person = Person.query.filter_by(id=person_id).first()
+#     if person:
+#         db.session.delete(person)
 #     else:
-#         return make_response(jsonify({"code": 404, "msg": "Post does not exist."}), 404)
+#         return make_response(jsonify({"code": 404, "msg": "Cannot find this person."}), 404)
 #
-#
-# @app.route("/post", methods={"POST"})
-# def post_post():
-#     content = request.form.get("content")
-#     if not content:
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Cannot put post. Content is empty."}), 403)
-#
-#     user_id = request.form.get("user_id")
-#     person_id_list = []
-#     person_id_list = db.session.query(Person.id).all()
-#     if not db.session.query(exists().where(Person.id == user_id)).scalar():
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Cannot put post. User does not exist."}), 403)
-#     p = Post(user_id=user_id, content=content)
-#     db.session.add(p)
 #     try:
 #         db.session.commit()
 #     except sqlalchemy.exc.SQLAlchemyError as e:
-#         error = "Cannot put post. "
-#         print(app.config.get("DEBUG"))
-#         if app.config.get("DEBUG"):
-#             error += str(e)
-#         return make_response(jsonify({"code": 404, "msg": error}), 404)
-#     return jsonify({"code": 200, "msg": "success"})
-#
-#
-# @app.route("/comment")
-# def get_all_comments():
-#     comment_list = Comment.query.all()
-#     return jsonify([row2dict(comment) for comment in comment_list])
-#
-#
-# @app.route("/comment", methods=["DELETE"])
-# def delete_all_comment():
-#     Comment.query.delete()
-#     comment_list = Comment.query.all()
-#     db.session.commit()
-#     return jsonify([row2dict(comment) for comment in comment_list])
-#
-#
-# @app.route("/comment/<comment_id>")
-# def get_comment(comment_id):
-#     comment = Post.query.filter_by(id=comment_id).first()
-#     if comment:
-#         return jsonify(row2dict(comment))
-#
-#
-# @app.route("/comment/<comment_id>", methods=["DELETE"])
-# def delete_comment_by_id(comment_id):
-#     comment = Comment.query.filter_by(comment_id=comment_id).first()
-#     if comment:
-#         Comment.query.filter_by(comment_id=comment_id).delete()
-#         db.session.commit()
-#         return jsonify({"code": 200, "msg": "success"})
-#     else:
-#         return make_response(jsonify({"code": 404, "msg": "Comment does not exist."}), 404)
-#
-#
-# @app.route("/comment", methods={"POST"})
-# def add_comment():
-#     comment = request.form.get("comment")
-#     commenter_id = request.form.get("commenter_id")
-#     post_id = request.form.get("post_id")
-#
-#     if not comment:
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Cannot put comment. Comment is empty."}), 403)
-#
-#     person_exists = db.session.query(db.exists().where(Person.id == commenter_id)).scalar()
-#     if not person_exists:
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Cannot comment on post. User does not exist."}), 403)
-#
-#     post_exists = db.session.query(db.exists().where(Post.post_id == post_id)).scalar()
-#     if not post_exists:
-#         return make_response(jsonify({"code": 403,
-#                                       "msg": "Cannot comment on post. Post does not exist."}), 403)
-#     c = Comment(post_id=post_id, commenter_id=commenter_id, comment=comment)
-#     db.session.add(c)
-#     try:
-#         db.session.commit()
-#     except sqlalchemy.exc.SQLAlchemyError as e:
-#         error = "Cannot put post. "
-#         print(app.config.get("DEBUG"))
+#         error = "Cannot delete person. "
+#         # print(app.config.get("DEBUG"))
 #         if app.config.get("DEBUG"):
 #             error += str(e)
 #         return make_response(jsonify({"code": 404, "msg": error}), 404)
