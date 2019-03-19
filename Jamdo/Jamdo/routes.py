@@ -6,7 +6,7 @@ from time import strftime
 from Jamdo.models import User
 from Jamdo import app , db, bcrypt
 
-import jwt , datetime,time
+import jwt, datetime, time
 
 url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
       "&titles="
@@ -26,21 +26,30 @@ def root():
   username = session["username"]
  return render_template('index.html', username=username ,today=today) 
 
+
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
 @app.route('/getEvent', methods=['GET']) #Change the route please help me
 def return_event_day():
  today = str(date.today()) 
  event_type = request.args.get("event_type")
- 
- type = 0
+
+ if int(year) < 1900 or int(year) > 2018:
+     return make_response(jsonify({"code": 403,
+                                   "msg": "Year has to be between 1900 and 2018"}), 403)
  if event_type == "event":
-  type = 1
+     type = 1
  elif event_type == "birth":
-  type = 2
+     if int(year) >= 2002:
+         return make_response(jsonify({"code": 403,
+                                       "msg": "There are no important births after 2001"}), 403)
+     type = 2
  elif event_type == "death":
-  type = 3
+     type = 3
+     if int(year) >= 2002:
+         type = 2
  else:
-  return make_response(jsonify({"code": 403, "msg": "There needs to be an event_type"}), 403)
+     return make_response(jsonify({"code": 403,
+                                   "msg": "There needs to be an event_type"}), 403)
  
  request_date = request.args.get("date")
  year=request_date.split("-")[0]
@@ -57,25 +66,34 @@ def return_event_day():
   return make_response(jsonify({"code": 403,
                                 "msg": "There is no information for that date"}), 403) 
 
+
 #YEAR AND MONTH ONLY
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
 def return_event_month(event_type, year, month):
-    location = request.args.get("location")
+    # location = request.args.get("location")
     type = 0
+    if int(year) < 1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
         type = 1
     elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
         type = 2
     elif event_type == "death":
         type = 3
+        if int(year) >= 2002:
+            type = 2
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
-    if not location:
-        result = output_data(year, month, 0, type)
+
     result = output_data(year, month, 0, type)
     return make_response(jsonify(result))
+
 
 #YEAR ONLY
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
@@ -83,29 +101,33 @@ def return_event_month(event_type, year, month):
 def return_event_year(event_type, year):
     location = request.args.get("location")
     type = 0
+    if int(year) <1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
         type = 1
     elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
         type = 2
     elif event_type == "death":
         type = 3
+        if int(year) >= 2002:
+            type = 2
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
+
     if not location:
         result = output_data(year, 1, 0, type)
     result = output_data(year, 1, 0, 1) ## for january
-    for i in range(2, 12):
+    for i in range(2, 13):
         nextMonth = output_data(year, i, 0, type)
         ##print(nextMonth)
         if nextMonth:
             result.update(nextMonth)
     return jsonify(result)
-
-
-
-
-
 
 
 @app.route('/login', methods=['GET', 'POST']) 
