@@ -38,12 +38,21 @@ def soen487_a1():
 def return_event_day(event_type, year, month, day):
     location = request.args.get("location")
     type = 0
+
+    if int(year) < 1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
         type = 1
     elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
         type = 2
     elif event_type == "death":
         type = 3
+        if int(year) >= 2002:
+            type = 2
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
@@ -64,12 +73,20 @@ def return_event_day(event_type, year, month, day):
 def return_event_month(event_type, year, month):
     location = request.args.get("location")
     type = 0
+    if int(year) <1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
         type = 1
     elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
         type = 2
     elif event_type == "death":
         type = 3
+        if int(year) >= 2002:
+            type = 2
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
@@ -84,19 +101,28 @@ def return_event_month(event_type, year, month):
 def return_event_year(event_type, year):
     location = request.args.get("location")
     type = 0
+    if int(year) <1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
         type = 1
     elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
         type = 2
     elif event_type == "death":
         type = 3
+        if int(year) >= 2002:
+            type = 2
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
+
     if not location:
         result = output_data(year, 1, 0, type)
     result = output_data(year, 1, 0, 1) ## for january
-    for i in range(2, 12):
+    for i in range(2, 13):
         nextMonth = output_data(year, i, 0, type)
         ##print(nextMonth)
         if nextMonth:
