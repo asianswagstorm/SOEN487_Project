@@ -3,14 +3,10 @@ import json
 import mwparserfromhell
 import re
 
-S = requests.Session()
-SEARCHPAGE = "1948"
-url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
-      "&titles="+SEARCHPAGE
+
+
 URL = "https://en.wikipedia.org/w/api.php"
 
-monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
-             7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
 ## TYPE --------
 ## 1 = events --
 ## 2 = births --
@@ -19,9 +15,9 @@ monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: '
 
 
 def output_data(year, month, day, type):
+
     url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
           "&titles="+str(year)
-
     monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
                  7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
                  13: 'Nobel Prizes'}
@@ -90,22 +86,26 @@ def output_data(year, month, day, type):
     return dict_for_event_per_day
 
 
-_newsAPI = "68525554ad474e1e8d84fae4e3dfbc76"
 
-PARAMS = {
-    'action':"query",
-    'list':"search",
-    'srsearch': SEARCHPAGE,
-    'format':"json"
-}
+    PARAMS = {
+        'action': "query",
+        'list': "search",
+        'srsearch': year,
+        'format': "json"
+    }
+    S = requests.Session()
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
 
 
-R = S.get(url=URL, params=PARAMS)
-DATA = R.json()
 
-if DATA['query']['search'][0]['title'] == SEARCHPAGE:
+
+
+
+'''''
+if DATA['query']['search'][0]['title'] == year:
     print("Your search page '" + SEARCHPAGE + "' exists on English Wikipedia")
-
+'''
 
 
 ##print(output_data(1948, 1, 1, 1))
