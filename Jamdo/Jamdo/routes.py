@@ -32,6 +32,10 @@ def root():
 def return_event_day():
  today = str(date.today()) 
  event_type = request.args.get("event_type")
+ request_date = request.args.get("date")
+ year=request_date.split("-")[0]
+ month= int(request_date.split("-")[1])
+ day= request_date.split("-")[2]
 
  if int(year) < 1900 or int(year) > 2018:
      return make_response(jsonify({"code": 403,
@@ -51,11 +55,6 @@ def return_event_day():
      return make_response(jsonify({"code": 403,
                                    "msg": "There needs to be an event_type"}), 403)
  
- request_date = request.args.get("date")
- year=request_date.split("-")[0]
- month= int(request_date.split("-")[1])
- day= request_date.split("-")[2]
-
  result = output_data(year, month, day, type)
  result = output_data(year, month, day, type)
  key = str(year) + " " + monthDict[month]+ " " + str(day)
