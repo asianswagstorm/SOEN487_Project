@@ -1,6 +1,7 @@
 from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response,url_for
 from Jamdo.config import DevConfig
 from RessourceGathering.wiki_parsing import output_data
+from RessourceGathering.movie_parsing import output_top_movie
 from datetime import date
 from time import strftime
 from Jamdo.models import User
@@ -126,6 +127,16 @@ def return_event_year(event_type, year):
         ##print(nextMonth)
         if nextMonth:
             result.update(nextMonth)
+    return jsonify(result)
+
+
+##fetching top movies
+@app.route('/movie/top/<int:number>', methods={"GET"})
+def return_top_movies(number):
+    if number <= 0 or number > 200:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Number of movies needs to be higher than 0 or smaller than 200"}), 403)
+    result = output_top_movie(number)
     return jsonify(result)
 
 
