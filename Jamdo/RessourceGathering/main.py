@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, make_response, request, url_for, redirect, render_template, flash
 from wiki_parsing import output_data
+from movie_parsing import output_top_movie
 from config import DevConfig
 
 
@@ -73,7 +74,7 @@ def return_event_day(event_type, year, month, day):
 def return_event_month(event_type, year, month):
     location = request.args.get("location")
     type = 0
-    if int(year) <1900 or int(year) > 2018:
+    if int(year) < 1900 or int(year) > 2018:
         return make_response(jsonify({"code": 403,
                                       "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
@@ -127,6 +128,15 @@ def return_event_year(event_type, year):
         ##print(nextMonth)
         if nextMonth:
             result.update(nextMonth)
+    return jsonify(result)
+
+
+@app.route('/movie/top/<int:number>', methods={"GET"})
+def return_top_movies(number):
+    if number <= 0 or number > 200:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Number of movies needs to be higher than 0 or smaller than 200"}), 403)
+    result = output_top_movie(number)
     return jsonify(result)
 
 
