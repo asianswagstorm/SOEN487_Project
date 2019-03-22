@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response,url_for
+from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response,url_for , redirect
 from Jamdo.config import DevConfig
 from RessourceGathering.wiki_parsing import output_data
 from RessourceGathering.movie_parsing import output_top_movie
@@ -29,50 +29,27 @@ def root():
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
-@app.route('/getEvent', methods=['GET']) #Change the route please help me
+@app.route('/getByFullDate', methods=['GET']) #Change the route please help me
 def return_event_day():
- today = str(date.today()) 
- event_type = request.args.get("event_type")
- request_date = request.args.get("date")
- year=request_date.split("-")[0]
- month= int(request_date.split("-")[1])
- day= request_date.split("-")[2]
+   #today = str(date.today()) 
+    event_type = request.args.get("event_type")
+    date = request.args.get("date")
 
- if int(year) < 1900 or int(year) > 2018:
-     return make_response(jsonify({"code": 403,
-                                   "msg": "Year has to be between 1900 and 2018"}), 403)
- if event_type == "event":
-     type = 1
- elif event_type == "birth":
-     if int(year) >= 2002:
-         return make_response(jsonify({"code": 403,
-                                       "msg": "There are no important births after 2001"}), 403)
-     type = 2
- elif event_type == "death":
-     type = 3
-     if int(year) >= 2002:
-         type = 2
- else:
-     return make_response(jsonify({"code": 403,
-                                   "msg": "There needs to be an event_type"}), 403)
+    if(len(date) < 8 and len(date) > 5): #try to filrer more stuff
+        year =date.split("-")[0]
+        month= int(date.split("-")[1])
+        return redirect('/'+ event_type + '/' + year + '/' + str(month))
+    elif(len(date) < 5):
+        return redirect('/'+ event_type + '/' + date)   
  
- result = output_data(year, month, day, type)
- result = output_data(year, month, day, type)
- key = str(year) + " " + monthDict[month]+ " " + str(day)
 
- if key in result:
-  return make_response(jsonify({key: result[key]}),200)
- else:
-  return make_response(jsonify({"code": 403,
-                                "msg": "There is no information for that date"}), 403) 
+    year =date.split("-")[0]
+    month= int(date.split("-")[1])
+    day= date.split("-")[2]
 
-
-#YEAR AND MONTH ONLY
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
-def return_event_month(event_type, year, month):
-    # location = request.args.get("location")
+    location = request.args.get("location")
     type = 0
+
     if int(year) < 1900 or int(year) > 2018:
         return make_response(jsonify({"code": 403,
                                       "msg": "Year has to be between 1900 and 2018"}), 403)
@@ -91,11 +68,45 @@ def return_event_month(event_type, year, month):
         return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
 
+    if not location:
+        result = output_data(year, month, day, type)
+    result = output_data(year, month, day, type)
+    key = str(year) + " " + monthDict[month]+ " " + str(day)
+    if key in result:
+        return make_response(jsonify({key: result[key]}))
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There is no information for that date"}), 403)
+
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
+@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
+def return_event_month(event_type, year, month):
+    location = request.args.get("location")
+    type = 0
+    if int(year) < 1900 or int(year) > 2018:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "Year has to be between 1900 and 2018"}), 403)
+    if event_type == "event":
+        type = 1
+    elif event_type == "birth":
+        if int(year) >= 2002:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There are no important births after 2001"}), 403)
+        type = 2
+    elif event_type == "death":
+        type = 3
+        if int(year) >= 2002:
+            type = 2
+    else:
+        return make_response(jsonify({"code": 403,
+                                      "msg": "There needs to be an event_type"}), 403)
+    if not location:
+        result = output_data(year, month, 0, type)
     result = output_data(year, month, 0, type)
     return make_response(jsonify(result))
 
 
-#YEAR ONLY
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
 @app.route('/<string:event_type>/<year>/', methods={"GET"})
 def return_event_year(event_type, year):
@@ -130,7 +141,6 @@ def return_event_year(event_type, year):
     return jsonify(result)
 
 
-##fetching top movies
 @app.route('/movie/top/<int:number>', methods={"GET"})
 def return_top_movies(number):
     if number <= 0 or number > 200:
@@ -138,7 +148,6 @@ def return_top_movies(number):
                                       "msg": "Number of movies needs to be higher than 0 or smaller than 200"}), 403)
     result = output_top_movie(number)
     return jsonify(result)
-
 
 @app.route('/login', methods=['GET', 'POST']) 
 def login():
