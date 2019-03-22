@@ -39,9 +39,11 @@ def return_event_day():
         year =date.split("-")[0]
         month= int(date.split("-")[1])
         return redirect('/'+ event_type + '/' + year + '/' + str(month))
-    elif(len(date) < 5):
+    elif(len(date) == 4): #year
         return redirect('/'+ event_type + '/' + date)   
  
+    elif(len(date) < 4): #movie
+        return redirect('/'+ event_type + '/' + date) 
 
     year =date.split("-")[0]
     month= int(date.split("-")[1])
