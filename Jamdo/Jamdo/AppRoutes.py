@@ -6,8 +6,8 @@ These should be the routes and functions that should be pathway for the servers 
 SERVER PORTS:
 Application 		default/:80
 Authentication 		:200 
-Cache 				:300
-Resource			:400
+Cache 			:300
+Resource		:400
 """
 
 #
@@ -51,8 +51,10 @@ def checkToken(auth_token):
 def decodeToken(token):
 	auth = {}
 	try:
-		payload = jwt.decode(auth_token, get_secret())
-		auth['payload'] = payload
+		#payload = jwt.decode(auth_token, get_secret())
+		#auth['payload'] = payload
+		
+		# check against db?
 		auth['success'] = True
 		return auth
 	except jwt.ExpiredSignatureError:
@@ -85,11 +87,23 @@ getAuthToken()
 def getDateInformation():
 	location = request.args.get('location')		# getting rid of location?
 
-	return 'Deletion ambiguous'
+	date = "%d/%d/%d", % (year,month,day) 
+	
+	cache = checkCachServer(date)
+	if(cache['isDataCached']):
+		#should return data to HTML templating engine
+		return jsonify(content=cache['content'])
+	else:
+		resource = requestResourceServer(date)
+		if resource['success']:
+			#should return data to HTML templating engine
+			return jsonify(content=cache['content'])
+		else
+			return jsonify(message=resource['message'])
 
 # client gets request by form submission
 @app.route('/onThisDay', methods=["POST"])
-def getDateInformation():
+def getDateInformationForm():
 	location = request.args.get('location')		# getting rid of location?
 	year = request.form.get('year')
 	month = request.form.get('month')
@@ -142,7 +156,9 @@ def isDateCached():
 	token = request.cookies.get('token');
 	auth = requests.post('localhost:200/checkToken',token=token)
 	if auth['success']:
-		cache_hit = False # do cache check here
+		
+		# do cache check here
+		cache_hit = False 
 		cached_content = ''
 
 		if cache_hit:
@@ -159,7 +175,9 @@ def addToDatabase():
 	auth = requests.post('localhost:200/checkToken',token=token)
 	if auth['success']:
 		request.args.get('content')
+		
 		# add to db
+		
 		success = True
 		if success:
 			return jsonify(success=True)
