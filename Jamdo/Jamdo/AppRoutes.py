@@ -2,12 +2,14 @@
 These should be the routes and functions that should be pathway for the servers to communicate to eachother
 - each server should, when it runs, register a token with the authentication server
 - everything is essentially a placeholder so you don't have to conform to it
+- this code is untested
+- stuff like: request.args.get('content') is still mostly conceptual, i don't know the datatype or format of the payload
 
 SERVER PORTS:
 Application 		default/:80
 Authentication 		:200 
-Cache 			:300
-Resource		:400
+Cache 				:300
+Resource			:400
 """
 
 #
@@ -211,11 +213,12 @@ def getInfo():
 	if auth['success']:
 		
 		# get content
- 
+ 		gathered_content = ''
+
 		if content:
-			cache_data = requests.get('localhost:300/addResource/'+date, cookie=SERVER_AUTH_COOKIE)
+			cache_data = requests.get('localhost:300/addResource/'+date, cookie=SERVER_AUTH_COOKIE, content=gathered_content)
 			if cache_data['success']:
-				return jsonify(success=True,content=cached_content)
+				return jsonify(success=True,content=gathered_content)
 			else:
 				return jsonify(success=False,message='Couldn\'t cache new resource')
 		else:
