@@ -1,0 +1,41 @@
+{%extends 'layout.html'%}
+
+{%block content%}
+<div id="showDatabase">
+	<h2>Users</h2>
+		<ul>
+			{%for u in users%}
+				<li>
+					<p>ID: <span>{{u.id}}</span></p>
+					<p>Username: <span>{{u.username}}</span></p>
+					<p>Email: <span>{{u.email}}</span></p>
+					<p>Password: <span>{{u.password}}</span></p>
+				</li>
+			{%endfor%}
+		</ul>
+	<hr>
+	<h2>Projects</h2>
+		<ul>
+			{%for p in projects%}
+				<li>
+					<p>ID: <span>{{p.id}}</span></p>
+					<p>Name: <span>{{p.name}}</span></p>
+					<p>User.id: <span>{{p.user_id}}</span></p>
+				</li>
+			{%endfor%}
+		</ul>
+	<hr>
+	<h2>Files</h2>
+		<ul>
+			{%for f in files%}
+				<li>
+					<p>ID: <span>{{f.id}}</span></p>
+					<p>Name: <span>{{f.name}}</span></p>
+					<p class='dump_file_content'>Content: <span>{{f.content}}</span></p>
+					<p>Timestamp: <span>{{f.timestamp}}</span></p>
+					<p>Project.id: <span>{{f.project_id}}</span></p>
+				</li>
+			{%endfor%}
+		</ul>
+</div>
+{%endblock%}

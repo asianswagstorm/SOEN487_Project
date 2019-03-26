@@ -1,0 +1,6 @@
+<div id="projects_container">
+	<h2>Current Projects</h2>
+	{%for project in projects%}
+		<a href='/projects/{{project.id}}'>{{project.name}}</a>
+	{%endfor%}
+</div>

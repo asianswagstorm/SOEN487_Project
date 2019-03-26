@@ -1,0 +1,7 @@
+<form id="project-form" class="form" action="/projects" method="POST" accept-charset="utf-8">
+	{% if error %}
+   		<p id="error_message">{{ error }}</p>
+    {% endif %}
+	<label>Add New Project<input type="text" name="project_name" placeholder="Project Name"></label>	
+	<input id='signup-form_submit' type="submit" value="Submit">
+</form>

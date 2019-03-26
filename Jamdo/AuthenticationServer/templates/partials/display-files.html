@@ -1,0 +1,12 @@
+<div id="files_container">
+	<h2>Current Files</h2>
+	<ul>
+	{%for file in files%}
+		<li>
+			<h3>{{file.name}}</h3><p>Modified: <em>{{file.timestamp}}</em></p>
+			<a href='/projects/{{file.project_id}}/{{file.id}}'>Edit</a>
+			<a href='/files/delete/{{file.project_id}}/{{file.id}}'>Delete</a>
+		</li>
+	{%endfor%}
+	</ul>
+</div>

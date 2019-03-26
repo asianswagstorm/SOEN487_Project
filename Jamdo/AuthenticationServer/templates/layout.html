@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  {% if title %}
+  <title>CR - {{ title }}</title>
+  {% else %}
+  <title>Code Repository</title>
+  {% endif %}
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
+</head>
+<body>
+  <header>
+  	<div #id="nav_title">Code Repository</div>
+    {%block nav%}
+    {%endblock%}
+  </header>
+  <section>
+  	<div id="raw-json">
+    	{{json}}
+  	</div>
+  {% block content %}
+  {% endblock %}
+  </section>
+  <footer>
+  	For Soen 487 - Assignment 1 by Nguyen Dinh
+  </footer>
+</body>
+</html>

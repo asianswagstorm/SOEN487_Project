@@ -1,0 +1,9 @@
+<form id="files-form" class="form" action="/files/{{project.id}}" method="POST" accept-charset="utf-8">
+	{% if error %}
+   		<p id="error_message">{{ error }}</p>
+    {% endif %}
+	<label>Add New File<input type="text" name="file_name" placeholder="File Name"></label>	
+	<label>Code<textarea name="file_content" placeholder="Add Code Here" rows="20" columns="15"></textarea></label>	
+	<input type="hidden" name="project_id" value="{{project.id}}">
+	<input id='signup-form_submit' type="submit" value="Submit">
+</form>

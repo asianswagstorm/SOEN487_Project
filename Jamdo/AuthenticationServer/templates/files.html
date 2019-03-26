@@ -1,0 +1,12 @@
+{%extends 'layout.html'%}
+
+{%block nav%}
+	{%include 'partials/nav-loggedin.html'%}
+{%endblock%}
+
+{%block content%}
+	<h2 id="page_title">{{project.name}}</h2>
+	{%include 'partials/form-new_file.html'%}
+	{%include 'partials/display-files.html'%}
+	<a id="delete_project" href="/projects/delete/{{project.id}}">Delete Project</a>
+{%endblock%}

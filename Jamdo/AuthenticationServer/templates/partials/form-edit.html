@@ -1,0 +1,9 @@
+<form id="files-form" class="form" action="/files/update/{{project.id}}/{{edit_file.id}}" method="POST" accept-charset="utf-8">
+	{% if error %}
+   		<p id="error_message">{{ error }}</p>
+    {% endif %}
+	<label>Edit File<input type="text" name="file_name" value="{{edit_file.name}}"></label>	
+	<label>Code<textarea name="file_content" rows="20" columns="15">{{edit_file.content}}</textarea></label>	
+	<input type="hidden" name="project_id" value="{{project.id}}">
+	<input id='signup-form_submit' type="submit" value="Update">
+</form>

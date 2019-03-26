@@ -1,0 +1,97 @@
+{%extends 'layout.html'%}
+
+{%block nav%}
+	{%include "partials/nav-generic.html"%}
+{%endblock%}
+
+{%block content%}
+	<div id="homepage_container">	
+		<h2>Welcome to Code Repository</h2>
+		<p>Here you can create and save code for various projects</p>
+		<div class="code_container">
+			<pre>
+from models import db, Book, User, Project, Files		# get db models
+
+from main import app
+from auth import *
+
+#use as db template
+@app.route("/dbTest",methods=["GET","POST"])
+def dbTest():
+	books = ['Empty']
+	if request.method == 'POST':
+		if request.form:
+			book = Book(title=request.form.get("title"))
+			db.session.add(book)
+			db.session.commit()
+			books = Book.query.all()
+			return render_template('test.html',books=books)
+
+	elif request.method == 'GET':
+		books = Book.query.all()
+		return render_template('test.html', books=books)
+
+# deletes all users
+@app.route('/users/delete')
+def usersDelete():
+	User.query.delete()
+	try:
+		db.session.commit()
+		return 'Deletion OK'
+	except:
+		return 'Deletion Fail'
+	return 'Deletion ambiguous'
+
+@app.route("/")
+def home():
+	return render_template('homepage.html')
+
+@app.route('/login',methods=["GET","POST"])
+def login():
+	# projects page
+	if request.method == 'POST':
+		username = request.form.get('username')
+		password = request.form.get('password')
+
+		user = User.query.filter_by(username=username).first()		
+		# user in DB
+		if user:
+			hashed_password = user.password
+			# Correct password
+			if bcrypt.checkpw(password.encode('utf-8'),hashed_password):
+				
+				# give user new token
+				auth_token = encode_auth_token(user.id)
+				response = make_response(redirect('/projects'))
+				response.set_cookie('token',auth_token)
+				return response
+			else:
+				error = 'Incorrect Password'
+				return render_template('login.html',title="Login",error=error)
+		else:
+			error = 'Incorrect Username/password'
+			return render_template('login.html',title="Login",error=error)
+
+	# Login page
+	else:
+		return render_template('login.html',title="Login")
+
+@app.route('/logout',methods=["GET"])
+def logout():
+	# give user invalid token
+	auth_token = encode_auth_token(-1)
+	response = make_response(redirect('/'))
+	response.set_cookie('token',auth_token)
+	return response
+
+@app.route('/users')
+def users():
+	users = ['None']
+	users = User.query.all()
+	print(users)
+	return render_template('users.html',data=users)
+
+			</pre>	
+		</div>	
+	</div>
+{%endblock%}

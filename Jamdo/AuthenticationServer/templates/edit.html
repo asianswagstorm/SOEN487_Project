@@ -1,0 +1,11 @@
+{%extends 'layout.html'%}
+
+{%block nav%}
+	{%include 'partials/nav-loggedin.html'%}
+{%endblock%}
+
+{%block content%}
+	<h2 id="page_title">{{project.name}}: {{edit_file.name}}</h2>
+	{%include 'partials/form-edit.html'%}
+	{%include 'partials/display-files.html'%}
+{%endblock%}

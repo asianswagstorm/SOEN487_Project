@@ -1,0 +1,9 @@
+{%extends 'layout.html'%}
+
+{%block content%}
+<div id="users_container">
+	{%for user in data%}
+		<p>{{user.id}} {{user.username}}  {{user.email}}</p>
+	{%endfor%}
+</div>
+{%endblock%}
