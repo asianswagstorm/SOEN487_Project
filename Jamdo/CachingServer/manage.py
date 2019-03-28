@@ -1,5 +1,5 @@
 from main import app
-from models import db, Results
+from models import db, Result
 
 
 @app.shell_context_processor

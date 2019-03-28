@@ -1,5 +1,5 @@
 class Config(object):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///SOEN487_A1.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite"
 
 
 class ProdConfig(Config):
@@ -8,8 +8,9 @@ class ProdConfig(Config):
 
 class DevConfig(Config):
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite"
 
 
 class TestConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///tests/test_SOEN487_A1.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite"

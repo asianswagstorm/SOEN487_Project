@@ -1,8 +1,8 @@
-from main import app
+# from main import app
 from flask_sqlalchemy import SQLAlchemy
 
 
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 
 def row2dict(row):
@@ -26,6 +26,15 @@ class Result(db.Model):
    # births = db.Column(db.Text)
     event = db.Column(db.Text)
    # horoscope = db.Column(db.Text)
+
+    def __init__(self, id, year, month, day, location, type, event):
+        self.id = id
+        self.year = year
+        self.month = month
+        self.day = day
+        self.location = location
+        self.type = type
+        self.event = event
 
     def __repr__(self):
         return "<Result {}: {}>".format(self.id, self.year, self.month, self.day, self.location, self.type, self.event)
