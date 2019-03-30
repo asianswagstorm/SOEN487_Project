@@ -484,9 +484,19 @@
 	}
 
 	.wrapper.style2 {
-		padding: 6em 0;
-		background: black;
-		color: white;
+		/*padding: 6em 0;*/
+		margin: 0 auto;
+		width: 2000px;
+		height:1500px;
+		background-color: white;
+		color: black;
+	}
+
+	
+	.wrapper.style3 {
+		margin: 0 auto;
+		background-color: white;
+		color: black;
 	}
 
 /* Header */
@@ -664,4 +674,8 @@
 		margin-top: 10px;
 		display: block;
 		align-self: 
+	}
+
+	#extra {
+		background-color: #ccc;
 	}

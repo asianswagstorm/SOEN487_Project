@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,abort,session ,flash , jsonify , make_response,url_for , redirect
+from flask import Flask,render_template,request,abort,session ,flash , jsonify, json , make_response,url_for , redirect
 from Jamdo.config import DevConfig
 from RessourceGathering.wiki_parsing import output_data
 from RessourceGathering.movie_parsing import output_top_movie
@@ -35,7 +35,7 @@ def return_event_day():
     event_type = request.args.get("event_type")
     date = request.args.get("date")
 
-    if(len(date) < 8 and len(date) > 5): #try to filrer more stuff
+    if(len(date) < 8 and len(date) > 5): #try to filter more stuff
         year =date.split("-")[0]
         month= int(date.split("-")[1])
         return redirect('/'+ event_type + '/' + year + '/' + str(month))
@@ -72,10 +72,15 @@ def return_event_day():
 
     if not location:
         result = output_data(year, month, day, type)
-    result = output_data(year, month, day, type)
-    key = str(year) + " " + monthDict[month]+ " " + str(day)
+        result = output_data(year, month, day, type)
+        key = str(year) + " " + monthDict[month]+ " " + str(day)
     if key in result:
-        return make_response(jsonify({key: result[key]}))
+        jsonObject = {key: result[key]}
+        jsonify_response = jsonify({key: result[key]})
+        return render_template('index.html', data = jsonObject)   
+       # return make_response(jsonify_response,200)
+
+
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There is no information for that date"}), 403)
@@ -106,7 +111,8 @@ def return_event_month(event_type, year, month):
     if not location:
         result = output_data(year, month, 0, type)
     result = output_data(year, month, 0, type)
-    return make_response(jsonify(result))
+    return render_template('index.html', data = result)   
+    #return make_response(jsonify(result))
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
@@ -140,7 +146,8 @@ def return_event_year(event_type, year):
         ##print(nextMonth)
         if nextMonth:
             result.update(nextMonth)
-    return jsonify(result)
+    return render_template('index.html', data = result)  
+    #return jsonify(result)
 
 
 @app.route('/movie/top/<int:number>', methods={"GET"})
@@ -149,7 +156,8 @@ def return_top_movies(number):
         return make_response(jsonify({"code": 403,
                                       "msg": "Number of movies needs to be higher than 0 or smaller than 200"}), 403)
     result = output_top_movie(number)
-    return jsonify(result)
+    return render_template('index.html', data = result) 
+   #return jsonify(result)
 
 @app.route('/login', methods=['GET', 'POST']) 
 def login():
