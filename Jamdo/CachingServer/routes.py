@@ -19,12 +19,18 @@ def soen487_a1():
     return jsonify({"microservice": "Caching Server"})
 
 
+# # DUMP entire database
+# @app.route('/showDatabase>', methods={"GET"})
+# def dump_database():
+
+
+
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/<day>', methods={"GET", "POST"})
-def return_event_day(event_type, year, month, day):
+@app.route('/<year>/<int:month>/<day>', methods={"GET", "POST"})
+def return_event_day(year, month, day):
     httpmethod = request.method
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, month=month, day=day, type=event_type).all()
+        results = Result.query.filter_by(year=year, month=month, day=day).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
@@ -70,11 +76,11 @@ def return_event_day(event_type, year, month, day):
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET", "POST"})
-def return_event_month(event_type, year, month):
+@app.route('/<year>/<int:month>/', methods={"GET", "POST"})
+def return_event_month(year, month):
     httpmethod = request.method
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, month=month, type=event_type).all()
+        results = Result.query.filter_by(year=year, month=month).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
@@ -116,11 +122,11 @@ def return_event_month(event_type, year, month):
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
-@app.route('/<string:event_type>/<year>/', methods={"GET", "POST"})
-def return_event_year(event_type, year):
+@app.route('/<year>/', methods={"GET", "POST"})
+def return_event_year(year):
     httpmethod = request.method
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, type=event_type).all()
+        results = Result.query.filter_by(year=year).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
