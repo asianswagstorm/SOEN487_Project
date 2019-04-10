@@ -19,10 +19,11 @@ def soen487_a1():
     return jsonify({"microservice": "Caching Server"})
 
 
-# # DUMP entire database
-# @app.route('/showDatabase>', methods={"GET"})
-# def dump_database():
-
+# DUMP entire database
+@app.route('/showDatabase', methods={"GET"})
+def dump_database():
+    result_list = Result.query.all()
+    return jsonify([row2dict(result) for result in result_list])
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
