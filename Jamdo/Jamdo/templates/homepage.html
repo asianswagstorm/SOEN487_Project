@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{%block content%}
+<!-- Wrapper -->
+<div class="wrapper style1">
+    <!-- Banner -->
+    <div id="banner" class="container">
+        <section>
+            {% if username %}
+            <p>Hello <strong>{{username}}</strong></p>
+            {% endif%}
+            <div class="container">
+                <div class="tm-search-form-container">
+                    {% include 'includes/_dateForm.html' %}
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Extra -->
+    <div id="extra">
+        <div class="container">
+        </div>
+    </div>
+</div>
+{%endblock%}

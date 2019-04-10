@@ -16,5 +16,9 @@ with app.app_context():
     # db.session.add(Result(id=2, year=2000, month=2, day=2, location="Montreal", type="birth", event="bla"))
     db.session.commit()
 
-if __name__ == '__main__':
-    app.run()
+#register server with Auth Server
+from authentication import getAuthToken
+APPLICATION_AUTH_TOKEN = getAuthToken(app.config['SERVER_AUTH_NAME'],app.config['SERVER_AUTH_PASSWORD'])
+
+if __name__ == "__main__":
+	app.run(debug=True,port=app.config['SERVER_PORT']) 

@@ -4,86 +4,93 @@ from flask import redirect
 from flask import jsonify
 import bcrypt as bcrypt
 import datetime
+import json
 
-from models import db, User, Project, Files				# get db models
+from models import db, Services				# get db models
 
 from main import app
 from auth import *										#encode, decode, protected endpoint
 								
+@app.route('/',methods=["GET"])
+def root():
+	return response(message="Hello World")
+
+@app.route('/showDatabase',methods=["GET"])
+def showData():
+	data = Services.query.all()
+	return render_template('response.html',data=data)
+
 # Authenticate token
-@app.route('/authenticate',methods=["POST"])
-def checkToken():
+@app.route('/getToken',methods=["POST"])
+def getToken():
+	# assume these arguments are encrypted across a network
+	service = request.args.get('service')
+	password = request.args.get('password')
 	
-	return 'Deletion ambiguous'
-		
-# Displays all User projects
-@app.route('/projects',methods=["GET","POST"])
-@protected_endpoint
-def projects(auth):
-	if 'payload' in auth:
-		client_id = auth['payload']['sub']
-		# display current projects
-		if request.method == 'GET':			
-			user = User.query.filter_by(id=client_id).first()
-			projects = Project.query.filter_by(user_id=user.id).all()
-			response = make_response(render_template('projects.html',title=user.username,username=user.username,projects=projects))
-			return response
+	"""
+	# put hashed password in auth server DB
+	hashed_password = 
 
-		# add new project
-		elif request.method == 'POST':
-			project_name = request.form.get('project_name')
-			user = User.query.filter_by(id=client_id).first()
+	# encrypt password
+	if service and bcrypt.checkpw(password.encode('utf-8'),hashed_password):		
+		auth_token = encode_auth_token(user.id)				
+	"""
 
-			# only add project to appropriate client id from token
-			if Project.query.filter_by(user_id=client_id,name=project_name).first() is None:
-				new_project = Project(user_id=user.id,name=project_name)
-				db.session.add(new_project)
-				try:
-					db.session.commit()
-				except sqlalchemy.exc.SQLAlchemyError as e:
-					print(e)
-					error = 'Cannot register project'
-					return make_response(render_template('/projects',title='Projects',error=error))
-				
-				# return new list of projects
-				projects = Project.query.filter_by(user_id=user.id).all()
-				response = make_response(render_template('projects.html',title=user.username,username=user.username,projects=projects))
-				return response
-			else:
-				error = 'Project name already in use'
-				return make_response(render_template('projects.html',title='Projects',error=error))
+	result_set = Services.query.filter_by(service=service,password=password).first()
+	print(result_set)
+	if result_set == None:
+		return jsonify(
+				status="fail",
+				message="Client Unknown"				
+			)
 	else:
-		response = make_response(render_template('error.html',error=auth['message']))
+		token = encode_auth_token(service)
+		result_set.token = token
+		db.session.commit()
+
+		response = make_response(jsonify(
+				status="success",			
+				token=str(token,'utf-8')
+			))
+
+		# Put token in client cookie
+		response.set_cookie('token',str(token))
 		return response
 
 
-# Authentication endpoint - not used - token given at login
-# https://medium.com/@riken.mehta/full-stack-tutorial-3-flask-jwt-e759d2ee5727
-# https://codeburst.io/jwt-authorization-in-flask-c63c1acf4eeb
-@app.route("/api/",methods=["POST"])
-def oauth():
-	if request.method == 'POST' and request.form:
-		username = request.form.get('username')
-		password = request.form.get('password')
+# client gets request by REST API
+@app.route('/authenticate', methods=["Post"])
+def authToken():
+	token = request.cookies.get('token')
+	decoded_token = {}
 
-		user = Clien.query.filter_by(username=username).first()
-		hashed_password = user.password
-
-		if user and bcrypt.checkpw(password.encode('utf-8'),hashed_password):		
-			# give user new token
-			auth_token = encode_auth_token(user.id)				
-			return jsonify({'token':auth_token.decode('ascii')}),200
+	# check for token/cookie
+	if not token:
+		decoded_token['status'] = 'fail'
+		decoded_token['message'] = 'No Token'
+		decoded_token['payload'] = 'None'
 	else:
-		return render_template('homepage.html',title='NO AUTH')
+		result_set = Services.query.all()
+		decoded_token['status'] = 'fail'
+		decoded_token['message'] = 'Unrecognized Token'
+		decoded_token['payload'] = 'None'
+
+		for service in result_set:
+			# token found
+			if str(service.token) == token:
+				# decode won't accept token as string, use DB byte string
+				decoded_token = decode_auth_token(service.token)
+		
+	return jsonify(status=decoded_token['status'],message=decoded_token['message'],payload=decoded_token['payload'])
 
 @app.errorhandler(404)
 def page_not_found(e):
-	response = make_response(render_template('404.html'))
+	response = make_response(jsonify(status='404 Not Found'))
 	response.status_code = 404
 	return response
 
 @app.errorhandler(500)
 def internal_error(e):
-	response = make_response(render_template('error.html',error="500 Internal Server Error"))
+	response = make_response(jsonify(status='500 Internal Server Error'))
 	response.status_code = 500
 	return response
