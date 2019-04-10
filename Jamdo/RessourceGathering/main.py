@@ -62,8 +62,13 @@ def return_event_day(event_type, year, month, day):
         result = output_data(year, month, day, type)
     result = output_data(year, month, day, type)
     key = str(year) + " " + monthDict[month]+ " " + str(day)
+
     if key in result:
-        return make_response(jsonify({key: result[key]}))
+        cache_url = "/" + year + "/" + month + "/" + day + "/"
+        r=requests.Session()
+        res = r.post(cache_url)
+
+        return make_response(jsonify({key: result[key]})
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There is no information for that date"}), 403)
@@ -94,7 +99,12 @@ def return_event_month(event_type, year, month):
     if not location:
         result = output_data(year, month, 0, type)
     result = output_data(year, month, 0, type)
-    return make_response(jsonify(result))
+
+    cache_url = "/" + year + "/" + month + "/"
+    r = requests.Session()
+    res = r.post(cache_url)
+
+    return make_response(jsonify(result)
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
@@ -128,7 +138,12 @@ def return_event_year(event_type, year):
         ##print(nextMonth)
         if nextMonth:
             result.update(nextMonth)
-    return jsonify(result)
+
+    cache_url = "/" + year + "/"
+    r = requests.Session()
+    res = r.post(cache_url)
+
+    return make_response(jsonify(result)
 
 
 @app.route('/movie/top/<int:number>', methods={"GET"})
