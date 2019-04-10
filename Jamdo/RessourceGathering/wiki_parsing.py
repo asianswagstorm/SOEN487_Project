@@ -5,7 +5,7 @@ import re
 
 
 
-URL = "https://en.wikipedia.org/w/api.php"
+URL = "http://en.wikipedia.org/w/api.php"
 
 ## TYPE --------
 ## 1 = events --
@@ -16,7 +16,7 @@ URL = "https://en.wikipedia.org/w/api.php"
 
 def output_data(year, month, day, type):
 
-    url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
+    url = "http://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
           "&titles="+str(year)
     monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
                  7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
@@ -109,7 +109,7 @@ if DATA['query']['search'][0]['title'] == year:
 
 
 ##print(output_data(1948, 1, 1, 1))
-test = output_data(1948, 2, 30, 1)
+# test = output_data(1948, 2, 30, 1)
 ##print(test["1948 January 30"])
 
 

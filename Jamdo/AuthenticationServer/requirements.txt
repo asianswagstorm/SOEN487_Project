@@ -1,0 +1,8 @@
+bcrypt
+Flask
+Flask-SQLAlchemy
+Jinja2
+PyJWT
+requests
+SQLAlchemy
+gunicorn

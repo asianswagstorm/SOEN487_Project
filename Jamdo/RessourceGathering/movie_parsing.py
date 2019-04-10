@@ -15,7 +15,7 @@ def output_top_movie(top_number):
     movieDict = dict()
     while iter_total < top_number:
         i += 1
-        url = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + api_key + "&language=en-US&page=" + str(i)
+        url = "http://api.themoviedb.org/3/movie/top_rated?api_key=" + api_key + "&language=en-US&page=" + str(i)
         request = requests.get(url)
         json_re = request.json()
 
@@ -35,7 +35,7 @@ def output_top_movie(top_number):
     return movieDict
 
 
-json_re2 = output_top_movie(66)
+# json_re2 = output_top_movie(66)
 
 
 
