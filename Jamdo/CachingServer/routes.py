@@ -4,6 +4,7 @@ from flask import redirect
 from flask import jsonify, json
 
 import datetime
+import sqlalchemy
 
 from models import db, Result, row2dict
 from main import app
@@ -134,7 +135,7 @@ def return_event_year(year):
 
     if httpmethod == "POST":
         # get the year first, if no year then fail
-        year = request.args.get('year')
+        # year = request.args.get('year')
 
         if not year:
             return make_response(jsonify({"code": 403,
