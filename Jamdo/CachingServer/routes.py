@@ -135,11 +135,13 @@ def return_event_year(year):
     if httpmethod == "POST":
         # get the year first, if no year then fail
         year = request.args.get('year')
+
         if not year:
             return make_response(jsonify({"code": 403,
                                           "msg": "Cannot post event. Missing mandatory fields."}), 403)
 
         # get the events JSON string and parse into a Python string
+
         content = request.get_json
         event = json.loads(content)
 

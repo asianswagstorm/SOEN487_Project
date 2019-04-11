@@ -3,7 +3,7 @@ from wiki_parsing import output_data
 from movie_parsing import output_top_movie
 from config import DevConfig
 
-
+import requests
 import sqlalchemy
 
 # need an app before we import models because models need it
@@ -29,7 +29,7 @@ def page_not_found(e):
 
 @app.route('/')
 def soen487_a1():
-    return jsonify({"title": "SOEN487 Assignment 1", "student": {"id": "27181000", "name": "Olivier Mercier-Peetz"}})
+    return jsonify({"microservice": "resource gathering"})
 
 # CAN ONLY SEARCH FROM 1900 to NOW
 
@@ -54,8 +54,8 @@ def return_event_day(event_type, year, month, day):
         type = 3
         if int(year) >= 2002:
             type = 2
-    else:
-        return make_response(jsonify({"code": 403,
+        else:
+            return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
 
     if not location:
@@ -64,11 +64,10 @@ def return_event_day(event_type, year, month, day):
     key = str(year) + " " + monthDict[month]+ " " + str(day)
 
     if key in result:
-        cache_url = "/" + year + "/" + month + "/" + day + "/"
+        cache_url = "http://127.0.0.1:5000/" + year + "/" + month + "/" + day + "/"
         r=requests.Session()
         res = r.post(cache_url)
-
-        return make_response(jsonify({key: result[key]})
+        return make_response(jsonify({key: result[key]}))
     else:
         return make_response(jsonify({"code": 403,
                                       "msg": "There is no information for that date"}), 403)
@@ -100,11 +99,11 @@ def return_event_month(event_type, year, month):
         result = output_data(year, month, 0, type)
     result = output_data(year, month, 0, type)
 
-    cache_url = "/" + year + "/" + month + "/"
+    cache_url = "http://127.0.0.1:5000/" + year + "/" + month + "/"
     r = requests.Session()
     res = r.post(cache_url)
 
-    return make_response(jsonify(result)
+    return make_response(jsonify(result))
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
@@ -139,11 +138,11 @@ def return_event_year(event_type, year):
         if nextMonth:
             result.update(nextMonth)
 
-    cache_url = "/" + year + "/"
+    cache_url = "http://127.0.0.1:5000/" + year + "/"
     r = requests.Session()
-    res = r.post(cache_url)
+    res = r.post(cache_url, data=result)
 
-    return make_response(jsonify(result)
+    return make_response(jsonify(result))
 
 
 @app.route('/movie/top/<int:number>', methods={"GET"})
@@ -159,4 +158,4 @@ def return_top_movies(number):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=3000)
