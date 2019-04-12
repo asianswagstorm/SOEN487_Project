@@ -9,17 +9,23 @@ from main import app, APPLICATION_AUTH_TOKEN as SERVER_TOKEN
 def getJAMDO(): 
   httpMethod = request.method
   today = str(date.today()) #yyyy-mm-dd
-  
+
   if httpMethod == 'GET':
     return render_template('homepage.html', today=today) 
   
   elif httpMethod == 'POST':
-    client_date = request.form.get('date')
-    
-    parsed_date = client_date.split('-')
-    year = parsed_date[0]
-    month = parsed_date[1]
-    day = parsed_date[2]
+    client_date = request.form.get('date') #yyyy-mm-dd
+    if(len(client_date) < 8 and len(client_date) > 5): #month year only 
+      year =client_date.split("-")[0]
+      month= client_date.split("-")[1]
+    elif(len(client_date) == 4):
+      year = str(client_date)
+
+    else: #full date
+     parsed_date = client_date.split('-')
+     year = parsed_date[0]
+     month = parsed_date[1]
+     day = parsed_date[2]
 
     data = ''
 
@@ -40,16 +46,43 @@ def getJAMDO():
       cookie = {'token':SERVER_TOKEN}
       
       # Authenticate token at other end
+      
       ext_request = requests.Session()
-      get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year + '/' + month + '/' + day, cookies=cookie)
+      #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year , cookies=cookie)  
+      #Full date Year Month Day
+      else:
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year + '/' + month + '/' + day, cookies=cookie)
+      
       deaths = get_resource_death.json()
 
       ext_request = requests.Session()
-      get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year + '/' + month + '/' + day, cookies=cookie)
+      #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year , cookies=cookie)
+      #Full date Year Month Day
+      else:
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year + '/' + month + '/' + day, cookies=cookie)
+      
       births = get_resource_birth.json()
 
       ext_request = requests.Session()
-      get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year + '/' + month + '/' + day, cookies=cookie)
+       #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year , cookies=cookie)
+      #Full date Year Month Day
+      else:
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year + '/' + month + '/' + day, cookies=cookie)
       events = get_resource_event.json()
 
       return render_template('results.html', births=births, deaths=deaths, events=events)   
