@@ -384,7 +384,7 @@
 		}
 
 			table.default tbody tr {
-				border-bottom: solid 1px #888888;
+				border-bottom: solid 1px #fafafa;
 			}
 
 			table.default td {
@@ -398,7 +398,7 @@
 			}
 
 			table.default thead {
-				background: #555555;
+				background: #fafafa;
 				color: #fff;
 			}
 
@@ -679,3 +679,4 @@
 	#extra {
 		background-color: #ccc;
 	}
+
