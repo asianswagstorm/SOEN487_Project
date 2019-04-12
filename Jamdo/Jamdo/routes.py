@@ -1,252 +1,92 @@
-from flask import Flask,render_template,request,abort,session ,flash , jsonify, json , make_response,url_for , redirect
-from Jamdo.config import DevConfig
-from RessourceGathering.wiki_parsing import output_data
-from RessourceGathering.movie_parsing import output_top_movie
-from datetime import date
+from flask import Flask, render_template, request, abort,session, flash, jsonify, make_response, url_for, redirect
+from datetime import date, time
 from time import strftime
-from Jamdo.models import User
-from Jamdo import app , db, bcrypt
+import requests
 
-import jwt, datetime, time
+from main import app, APPLICATION_AUTH_TOKEN as SERVER_TOKEN
 
-url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
-      "&titles="
-URL = "https://en.wikipedia.org/w/api.php"
+@app.route('/', methods=['GET','POST'])
+def getJAMDO(): 
+  httpMethod = request.method
+  today = str(date.today()) #yyyy-mm-dd
 
-monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
-             7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
-
-
-@app.route('/', methods=['GET'])
-def root(): 
- today = str(date.today()) #yyyy-mm-dd
- if not session.get("username"):
-  session["username"] = 0
-  username = ""
- else:
-  username = session["username"]
- return render_template('index.html', username=username ,today=today) 
-
-
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
-@app.route('/getByFullDate', methods=['GET']) #Change the route please help me
-def return_event_day():
-   #today = str(date.today()) 
-    event_type = request.args.get("event_type")
-    date = request.args.get("date")
-
-    if(len(date) < 8 and len(date) > 5): #try to filter more stuff
-        year =date.split("-")[0]
-        month= int(date.split("-")[1])
-        return redirect('/'+ event_type + '/' + year + '/' + str(month))
-    elif(len(date) == 4): #year
-        return redirect('/'+ event_type + '/' + date)   
- 
-    elif(len(date) < 4): #movie
-        return redirect('/'+ event_type + '/' + date) 
-
-    year =date.split("-")[0]
-    month= int(date.split("-")[1])
-    day= date.split("-")[2]
-
-    location = request.args.get("location")
-    type = 0
-
-    if int(year) < 1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
-            type = 2
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
-
-    if not location:
-        result = output_data(year, month, day, type)
-        result = output_data(year, month, day, type)
-        key = str(year) + " " + monthDict[month]+ " " + str(day)
-    if key in result:
-        jsonObject = {key: result[key]}
-        jsonify_response = jsonify({key: result[key]})
-        return render_template('index.html', data = jsonObject)   
-       # return make_response(jsonify_response,200)
-
-
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There is no information for that date"}), 403)
-
-
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
-def return_event_month(event_type, year, month):
-    location = request.args.get("location")
-    type = 0
-    if int(year) < 1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
-            type = 2
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
-    if not location:
-        result = output_data(year, month, 0, type)
-    result = output_data(year, month, 0, type)
-    return render_template('index.html', data = result)   
-    #return make_response(jsonify(result))
-
-
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
-@app.route('/<string:event_type>/<year>/', methods={"GET"})
-def return_event_year(event_type, year):
-    location = request.args.get("location")
-    type = 0
-    if int(year) <1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
-            type = 2
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
-
-    if not location:
-        result = output_data(year, 1, 0, type)
-    result = output_data(year, 1, 0, 1) ## for january
-    for i in range(2, 13):
-        nextMonth = output_data(year, i, 0, type)
-        ##print(nextMonth)
-        if nextMonth:
-            result.update(nextMonth)
-    return render_template('index.html', data = result)  
-    #return jsonify(result)
-
-
-@app.route('/movie/top/<int:number>', methods={"GET"})
-def return_top_movies(number):
-    if number <= 0 or number > 200:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Number of movies needs to be higher than 0 or smaller than 200"}), 403)
-    result = output_top_movie(number)
-    return render_template('index.html', data = result) 
-   #return jsonify(result)
-
-@app.route('/login', methods=['GET', 'POST']) 
-def login():
- if request.method == "GET":
-  return render_template('login.html', title="Register")
- else:
-  auth = request.authorization 
-  username = request.form.get("u")
-  password = request.form.get("p")
+  if httpMethod == 'GET':
+    return render_template('homepage.html', today=today) 
   
-  if (not username or not password):
-   flash("Missing at least one input fields", "danger")
-   return make_response(render_template('login.html', title="Login"),500)
+  elif httpMethod == 'POST':
+    client_date = request.form.get('date') #yyyy-mm-dd
+    if(len(client_date) < 8 and len(client_date) > 5): #month year only 
+      year =client_date.split("-")[0]
+      month= client_date.split("-")[1]
+    elif(len(client_date) == 4):
+      year = str(client_date)
 
-  if(User.query.filter_by(username=username).first() is None):
-   flash("User " + username + " not found in DB", "danger")
-   return  make_response(render_template('login.html', title="Login"),404)
-  user = User.query.filter_by(username=username).first()  
-  if(not bcrypt.check_password_hash(user.password, password)): #user.password != password
-   flash("Incorrect password", "danger")
-   return make_response(render_template('login.html', title="Login"),401) #unauthorize status code
+    else: #full date
+     parsed_date = client_date.split('-')
+     year = parsed_date[0]
+     month = parsed_date[1]
+     day = parsed_date[2]
 
-  #Create token conditions passed ???
-  token = jwt.encode({'iss': "http://localhost:5000/" , 'id' : user.id,'username' : username, 'iat': datetime.datetime.utcnow(), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)} ,app.config["SECRET_KEY"])
-  session["username"] = username
-  session["token"] = token.decode('UTF-8')
-  #return jsonify({'token' : token.decode('UTF-8')})
-  return make_response(render_template('index.html', username = username), 200)   
+    data = ''
 
-@app.route('/register', methods=['GET', 'POST']) 
-def register():
- 
- if request.method == "GET":
-  return render_template('register.html', title="Register")
- else:
-  fname = request.form.get("f")
-  lname = request.form.get("l")
-  username = request.form.get("u")
-  password = request.form.get("p") #hash the password
-  pw_hash = bcrypt.generate_password_hash(password)
-
-  user_list = User.query.all()
-  max_id = 0
-  for i in user_list:
-   if i.id > max_id:
-    max_id = i.id
-  if not username or not password or username == "" or password == "" :
-   flash("Variable missing, please enter username or password", "danger")
-   return make_response(render_template('register.html', title="Register"),404)
-  
-  if(not User.query.filter_by(username=username).first() is None):
-    flash("Username already exists", "danger")
-    return make_response(render_template('register.html', title="Register"),500)
-  
-  new_user =  User(max_id+1,fname,lname,username,pw_hash)
-  db.session.add(new_user) 
-  db.session.commit() 
-  session["username"] = username
-  return make_response(render_template('index.html', username = username),200)   
-   
-@app.route('/logout')
-def logout(): 
- session.clear()   
- return render_template('index.html')
-
-@app.route('/users', methods=['GET', 'POST'])
-def displayUsers(): 
-
- if request.method == "GET":
-  return render_template('users.html', users = User.query.all())
- else:
-   user_id = request.form["id_number"]
-   username = request.form["u"]
-   if not user_id and not username :
-     flash("Invalid Field", "danger")
-     return render_template('users.html', users = User.query.all())
-   
-   elif user_id is not None and not user_id == "": 
-    id_to_delete = User.query.filter_by(id=user_id).first()
-    db.session.delete(id_to_delete)
-   elif username is not None and not username == "": 
-    user_to_delete = User.query.filter_by(username=username).first()
-    db.session.delete(user_to_delete)
-   elif username is not None and user_id is not None:
-    id_to_delete = User.query.filter_by(id=user_id).first()
-    user_to_delete = User.query.filter_by(username=username).first()
-    db.session.delete(id_to_delete)  
-    db.session.delete(user_to_delete)
-
-   db.session.commit() 
-   return render_template('users.html', users = User.query.all())
+    ### check caching server for data ###
+    # cache_check = request.get('http://127.0.0.1:7000/year/month/day')
+    # cache = cache_check.json()
+    cache = {}
+    cache['hit'] = 'False'
+    cache['data'] = 'akldaf;j'
+    
+    # get data from cache server
+    if cache['hit'] == 'True':
+      data = cache['data']
+      return render_template('results.html', births=births, deaths=deaths, events=events)         
+    
+    ### get data from resource server ###
+    elif cache['hit'] == 'False':
+      cookie = {'token':SERVER_TOKEN}
       
+      # Authenticate token at other end
+      
+      ext_request = requests.Session()
+      #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year , cookies=cookie)  
+      #Full date Year Month Day
+      else:
+       get_resource_death = ext_request.get('http://127.0.0.1:5000/death/' + year + '/' + month + '/' + day, cookies=cookie)
+      
+      deaths = get_resource_death.json()
+
+      ext_request = requests.Session()
+      #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year , cookies=cookie)
+      #Full date Year Month Day
+      else:
+       get_resource_birth = ext_request.get('http://127.0.0.1:5000/birth/' + year + '/' + month + '/' + day, cookies=cookie)
+      
+      births = get_resource_birth.json()
+
+      ext_request = requests.Session()
+       #Year Month Only
+      if(len(client_date) < 8 and len(client_date) > 5):
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year + '/' + month, cookies=cookie)
+      #Year only 
+      elif(len(client_date) == 4):
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year , cookies=cookie)
+      #Full date Year Month Day
+      else:
+       get_resource_event = ext_request.get('http://127.0.0.1:5000/event/' + year + '/' + month + '/' + day, cookies=cookie)
+      events = get_resource_event.json()
+
+      return render_template('results.html', births=births, deaths=deaths, events=events)   
+    
+    else:
+      return render_template('error.html', message='Cache error')
+
