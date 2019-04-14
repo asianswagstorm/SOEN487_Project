@@ -69,7 +69,7 @@ def return_event_day(event_type, year, month, day):
         #     result = output_data(year, month, day, type)
 
         result = output_data(year, month, day, type)
-        result1 = json.dumps(result)
+
         key = str(year) + " " + monthDict[month]+ " " + str(day)
 
         # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
@@ -81,15 +81,15 @@ def return_event_day(event_type, year, month, day):
         if key in result:
             # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
             r = requests.Session()
-            r.post(cache_url, data=result1)
+            r.post(cache_url, data=json.dumps(result[key]))
             return make_response(jsonify({key: result[key]}))
         else:
             return make_response(jsonify({"code": 403,
                                           "msg": "There is no information for that date"}), 403)
     # If search query in cache
     else:
-        #return jsonify(cache_response.json())
-        return "There already"
+        return jsonify(cache_response.json())
+        #return "There already"
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
