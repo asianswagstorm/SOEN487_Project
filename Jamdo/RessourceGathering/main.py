@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, make_response, request, url_for, redirect, render_template, flash
+from flask import Flask, jsonify, make_response, request, url_for, redirect, render_template, flash, json
 from wiki_parsing import output_data
 from movie_parsing import output_top_movie
 from config import DevConfig
@@ -69,6 +69,7 @@ def return_event_day(event_type, year, month, day):
         #     result = output_data(year, month, day, type)
 
         result = output_data(year, month, day, type)
+        result1 = json.dumps(result)
         key = str(year) + " " + monthDict[month]+ " " + str(day)
 
         # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
@@ -80,15 +81,15 @@ def return_event_day(event_type, year, month, day):
         if key in result:
             # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
             r = requests.Session()
-            r.post(cache_url, data=result)
+            r.post(cache_url, data=result1)
             return make_response(jsonify({key: result[key]}))
         else:
             return make_response(jsonify({"code": 403,
                                           "msg": "There is no information for that date"}), 403)
     # If search query in cache
     else:
-        return jsonify(cache_response.json())
-
+        #return jsonify(cache_response.json())
+        return "There already"
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
@@ -123,7 +124,8 @@ def return_event_month(event_type, year, month):
             result = output_data(year, month, 0, type)
         result = output_data(year, month, 0, type)
 
-        res = r.post(cache_url, data=result)
+        result1 = json.dumps(result)
+        res = r.post(cache_url, data=result1)
         return make_response(jsonify(result))
     else:
         return jsonify(cache_response.json())
@@ -167,8 +169,8 @@ def return_event_year(event_type, year):
             ##print(nextMonth)
             if nextMonth:
                 result.update(nextMonth)
-
-        res = r.post(cache_url, data=result)
+        result1 = json.dumps(result)
+        res = r.post(cache_url, data=result1)
         return make_response(jsonify(result))
 
     # If search query in cache
@@ -188,4 +190,4 @@ def return_top_movies(number):
 # -------------------------     END SETUP SECTION   ------------------------------------------------------------
 
 if __name__ == '__main__':
-    app.run(debug=True,port=app.config['SERVER_PORT']) 
+    app.run(debug=True, port=app.config['SERVER_PORT'])
