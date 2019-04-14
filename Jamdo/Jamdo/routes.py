@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, abort,session, flash, jsonify
 from datetime import date, time
 from time import strftime
 from models import db, User
-import jwt, datetime, time ,requests
+import jwt, datetime, time ,requests , re
 
 from main import app , bcrypt, APPLICATION_AUTH_TOKEN as SERVER_TOKEN
 
@@ -16,6 +16,17 @@ def getJAMDO():
   
   elif httpMethod == 'POST':
     client_date = request.form.get('date') #yyyy-mm-dd
+
+    if (not client_date):
+      flash("Date Input Cannot be Blank ", "danger")
+      return make_response(render_template('homepage.html', inputError="something"),500)
+
+    x=re.search("^([12]\d{3}(-(0[1-9]|1[0-2]))*)(-(0[1-9]|[12]\d|3[01]))*$",client_date)
+
+    if (not x):
+      flash("Invalid Date Format YYYY-MM-DD , YYYY-MM or YYYY only", "danger")
+      return make_response(render_template('homepage.html', inputError="something"),500)
+
     if(len(client_date) < 8 and len(client_date) > 5): #month year only 
       year =client_date.split("-")[0]
       month= client_date.split("-")[1]
@@ -102,15 +113,15 @@ def login():
   
   if (not username or not password):
    flash("Missing at least one input fields", "danger")
-   return make_response(render_template('login.html', title="Login"),500)
+   return make_response(render_template('login.html', inputError="Login"),500)
 
   if(User.query.filter_by(username=username).first() is None):
    flash("User " + username + " not found in DB", "danger")
-   return  make_response(render_template('login.html', title="Login"),404)
+   return  make_response(render_template('login.html', inputError="Login"),404)
   user = User.query.filter_by(username=username).first()  
   if(not bcrypt.check_password_hash(user.password, password)): #user.password != password
    flash("Incorrect password", "danger")
-   return make_response(render_template('login.html', title="Login"),401) #unauthorize status code
+   return make_response(render_template('login.html', inputError="Login"),401) #unauthorize status code
 
   #Create token conditions passed ???
   #token = jwt.encode({'iss': "http://localhost:9000/" , 'id' : user.id,'username' : username, 'iat': datetime.datetime.utcnow(), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)} ,app.config["SECRET_KEY"])
@@ -139,11 +150,11 @@ def register():
     max_id = i.id
   if not username or not password or username == "" or password == "" :
    flash("Variable missing, please enter username or password", "danger")
-   return make_response(render_template('register.html', title="Register"),404)
+   return make_response(render_template('register.html', inputError="Register"),404)
   
   if(not User.query.filter_by(username=username).first() is None):
     flash("Username already exists", "danger")
-    return make_response(render_template('register.html', title="Register"),500)
+    return make_response(render_template('register.html', inputError="Register"),500)
   
   new_user =  User(max_id+1,fname,lname,username,pw_hash)
   db.session.add(new_user) 

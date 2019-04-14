@@ -5,8 +5,10 @@
     <!-- Banner -->
  <div class="login">
     <form method="post">
+        {% if inputError %}
 		<a href="login" class="button medium">{% include "includes/__messages__.html "%}</a>
-    	<input type="text" name="u" placeholder="Username" required="required" />
+    	 {% endif %}
+        <input type="text" name="u" placeholder="Username" required="required" />
         <input type="password" name="p" placeholder="Password" required="required" />
        
 	   	<ul class="actions">

@@ -4,13 +4,18 @@
 <!-- Wrapper -->
 <div class="wrapper style1">
     <!-- Banner -->
+    
     <div id="banner" class="container">
         <section>
             {% if username %}
             <p>Hello <strong>{{username}}</strong></p>
             {% endif%}
+            {% if inputError %}
+            <a href="/" class="button medium">{% include "includes/__messages__.html "%}</a>
+            {% endif%}
             <div class="container">
                 <div class="tm-search-form-container">
+               
                     {% include 'includes/_dateForm.html' %}
                 </div>
             </div>
@@ -22,4 +27,5 @@
         </div>
     </div>
 </div>
+ 
 {%endblock%}
