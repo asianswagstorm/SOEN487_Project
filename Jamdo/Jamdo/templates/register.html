@@ -1,43 +1,9 @@
-<!DOCTYPE HTML>
-
-<html>
-	<head>
-		<title>JAMDO Register</title>
-		<span class="tag">search interesting events</span>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-		<script src="/static/js/jquery.min.js"></script>
-		<script src="/static/js/jquery.dropotron.min.js"></script>
-		<script src="/static/js/skel.min.js"></script>
-		<script src="/static/js/skel-layers.min.js"></script>
-		<script src="/static/js/init.js"></script> 
-
-		<noscript>
-			<link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='/static/css/register.css')}}" />
-		</noscript>
-		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
-	</head>
-   <body> 
-   <div class="wrapper style1">
-
-				<!-- Header -->
-				<div id="header" class="skel-panels-fixed">
-					<div id="logo">
-						<h1><a href="/">JAMDO</a></h1>
-						<span class="tag"></span>
-					</div>
-					<nav id="nav">
-						<ul>
-							<li><a href="/">Homepage</a></li>
-							<li><a href="/login">Login</a></li>
-							<li class="active"><a href="/register">Register</a></li>
-						</ul>
-					</nav>
-				</div>
-				
-<div class="register">	
+{% extends 'layout.html' %}
+{%block content%}
+<!-- Wrapper -->
+<div class="wrapper style1">
+    <!-- Banner -->
+ <div class="register">	
     <form action = "{{ url_for('register') }}" method="POST">
 		
 		<a href="register" class="button medium">{% include "includes/__messages__.html "%}</a>
@@ -53,17 +19,11 @@
 		</ul>
     </form>
 </div>
+    <!-- Extra -->
+    <div id="extra">
+        <div class="container">
+        </div>
+    </div>
+</div>
+{%endblock%}
 
-<!-- Copyright -->
-		<div id="copyright">
-			<div class="container">
-				<div class="copyright">
-					<p> <a href="http://templated.co">JAMDO</a> </p>
-					<ul class="icons">
-						<li><a href="https://github.com/asianswagstorm/SOEN487_Project" class="fa fa-github"><span>Github</span></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-</body>
-</html>

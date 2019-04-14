@@ -1,80 +1,36 @@
-<!DOCTYPE HTML>
+{% extends 'layout.html' %}
+{%block content%}
+<!-- Wrapper -->
+<div class="wrapper style1">
+    <!-- Banner -->
 
-<html>
-	<head>
-		<title>Users</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-		<script src="/static/js/jquery.min.js"></script>
-		<script src="/static/js/jquery.dropotron.min.js"></script>
-		<script src="/static/js/skel.min.js"></script>
-		<script src="/static/js/skel-layers.min.js"></script>
-		<script src="/static/js/init.js"></script> 
-		<noscript>
-			<link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='/static/css/skel.css')}}" />
-			<link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='/static/css/style.css')}}" />
-			<link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='/static/css/style-wide.css')}}"/>
-		</noscript>
-		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
-	</head>
-	<body>
-
-		<!-- Wrapper -->
-			<div class="wrapper style1">
-
-				<!-- Header -->
-				<div id="header" class="skel-panels-fixed">
-					<div id="logo">
-						<h1><a href="/">JAMDO</a></h1>
-						<span class="tag">search interesting events</span>
-					
-					</div>
-					{% include "includes/__messages__.html "%}
-					<nav id="nav">
-						<ul>
-							<li class="active"><a href="/">Homepage</a></li>
-								{% if username %}
-							<li><a href="logout">Logout</a></li>
-							{% else%}
-							<li><a href="login">Login</a></li>
-							<li><a href="register">Register</a></li>
-							{% endif%}
-							
-						</ul>
-					</nav>
-				</div>
-				
-				<!-- Banner -->
-					<div id="banner" class="container">
-						 <h3>Users (<a href = "{{ url_for('register') }}">Register New User
-         </a>)</h3>
-      
-      <table>
-         <thead>
-            <tr>
-               <th>Id</th>
-               <th>Username</th>
-               <th>Password</th>
-            </tr>
-         </thead>
-
-         <tbody>
-            {% for i in users %}
+    <!-- Extra -->
+    <div id="extra">
+        <div class="container">
+		     <table class="users">
+        <thead class="table_header">
+        <tr>
+            <th class="table_title" colspan="5">
+                <h2>Users</h2>
+            </th>
+        </tr>
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Password</th>
+        </tr>
+        </thead>
+        <tbody class="table_data">
+       		 {% for i in users %}
                <tr>
                   <td>{{ i.id }}</td>
                   <td>{{ i.username }}</td>
                   <td>{{ i.password }}</td>
                </tr>
             {% endfor %}
-         </tbody>
-      </table>
-					</div>
-
-      <div id="footer" class="wrapper style2">
-			<div class="container">
-				<section>
+    		</tbody>
+    </table>
+		  <section>
 					<header class="major">
 						<a href="#" class="button medium">{% include "includes/__messages__.html "%}</a>
 						<h2>Delete User By ID or By Username</h2>
@@ -100,22 +56,8 @@
 						</div>
 					</form>
 				</section>
-			</div>
-		</div>
+        </div>
+    </div>
+</div>
+{%endblock%}
 
-
-
-	<!-- Copyright -->
-		<div id="copyright">
-			<div class="container">
-				<div class="copyright">
-					<p> <a href="http://templated.co">JAMDO</a> </p>
-					<ul class="icons">
-						<li><a href="https://github.com/asianswagstorm/SOEN487_Project" class="fa fa-github"><span>Github</span></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-
-	</body>
-</html>

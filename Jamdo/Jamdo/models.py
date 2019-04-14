@@ -1,4 +1,6 @@
-from Jamdo import db 
+from main import app
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy(app)
 
 class User(db.Model):
     __tablename__ = 'USERS'
@@ -27,4 +29,4 @@ class API(db.Model):
     def __repr__(self):
         return "<Person {}: {} {}>".format(self.id, self.name, self.url, self.param)
 
-db.create_all()
+
