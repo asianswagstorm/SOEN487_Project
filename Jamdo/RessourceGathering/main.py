@@ -37,112 +37,143 @@ def soen487_a1():
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/<day>', methods={"GET"})
 def return_event_day(event_type, year, month, day):
-    location = request.args.get("location")
-    type = 0
 
-    if int(year) < 1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
+    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/" + str(month) + "/" + day + "/"
+    r = requests.Session()
+    cache_response = r.get(cache_url)
+
+    # If search query not in cache
+    if cache_response.json() == {"code": 204, "msg": "no results"}:
+        location = request.args.get("location")
+
+        type = 0
+        if int(year) < 1900 or int(year) > 2018:
             return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
+                                          "msg": "Year has to be between 1900 and 2018"}), 403)
+        if event_type == "event":
+            type = 1
+        elif event_type == "birth":
+            if int(year) >= 2002:
+                return make_response(jsonify({"code": 403,
+                                              "msg": "There are no important births after 2001"}), 403)
             type = 2
+        elif event_type == "death":
+            type = 3
+            if int(year) >= 2002:
+                type = 2
+            else:
+                return make_response(jsonify({"code": 403,
+                                          "msg": "There needs to be an event_type"}), 403)
+
+        # if not location:
+        #     result = output_data(year, month, day, type)
+
+        result = output_data(year, month, day, type)
+        key = str(year) + " " + monthDict[month]+ " " + str(day)
+
+        # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
+        # res = r.post(cache_url, data=result)
+        # make_response(jsonify({key: result[key]}))
+        # return make_response(jsonify({"code": 403,
+        #                               "msg": "There is no information for that date"}), 403)
+
+        if key in result:
+            # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
+            r = requests.Session()
+            r.post(cache_url, data=result)
+            return make_response(jsonify({key: result[key]}))
         else:
             return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
-
-    if not location:
-        result = output_data(year, month, day, type)
-    result = output_data(year, month, day, type)
-    key = str(year) + " " + monthDict[month]+ " " + str(day)
-
-    if key in result:
-        cache_url = "http://127.0.0.1:5000/" + year + "/" + month + "/" + day + "/"
-        r=requests.Session()
-        res = r.post(cache_url)
-        return make_response(jsonify({key: result[key]}))
+                                          "msg": "There is no information for that date"}), 403)
+    # If search query in cache
     else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There is no information for that date"}), 403)
+        return jsonify(cache_response.json())
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
 def return_event_month(event_type, year, month):
-    location = request.args.get("location")
-    type = 0
-    if int(year) < 1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
-            type = 2
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
-    if not location:
-        result = output_data(year, month, 0, type)
-    result = output_data(year, month, 0, type)
 
-    cache_url = "http://127.0.0.1:5000/" + year + "/" + month + "/"
+    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/" + str(month) + "/"
     r = requests.Session()
-    res = r.post(cache_url)
+    cache_response = r.get(cache_url)
 
-    return make_response(jsonify(result))
+    # If search query not in cache
+    if cache_response.json() == {"code": 204, "msg": "no results"}:
+        location = request.args.get("location")
+        type = 0
+        if int(year) < 1900 or int(year) > 2018:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Year has to be between 1900 and 2018"}), 403)
+        if event_type == "event":
+            type = 1
+        elif event_type == "birth":
+            if int(year) >= 2002:
+                return make_response(jsonify({"code": 403,
+                                              "msg": "There are no important births after 2001"}), 403)
+            type = 2
+        elif event_type == "death":
+            type = 3
+            if int(year) >= 2002:
+                type = 2
+        else:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There needs to be an event_type"}), 403)
+        if not location:
+            result = output_data(year, month, 0, type)
+        result = output_data(year, month, 0, type)
+
+        res = r.post(cache_url, data=result)
+        return make_response(jsonify(result))
+    else:
+        return jsonify(cache_response.json())
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
 @app.route('/<string:event_type>/<year>/', methods={"GET"})
 def return_event_year(event_type, year):
-    location = request.args.get("location")
-    type = 0
-    if int(year) <1900 or int(year) > 2018:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "Year has to be between 1900 and 2018"}), 403)
-    if event_type == "event":
-        type = 1
-    elif event_type == "birth":
-        if int(year) >= 2002:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "There are no important births after 2001"}), 403)
-        type = 2
-    elif event_type == "death":
-        type = 3
-        if int(year) >= 2002:
-            type = 2
-    else:
-        return make_response(jsonify({"code": 403,
-                                      "msg": "There needs to be an event_type"}), 403)
 
-    if not location:
-        result = output_data(year, 1, 0, type)
-    result = output_data(year, 1, 0, 1) ## for january
-    for i in range(2, 13):
-        nextMonth = output_data(year, i, 0, type)
-        ##print(nextMonth)
-        if nextMonth:
-            result.update(nextMonth)
-
-    cache_url = "http://127.0.0.1:5000/" + year + "/"
+    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/"
     r = requests.Session()
-    res = r.post(cache_url, data=result)
+    cache_response = r.get(cache_url)
 
-    return make_response(jsonify(result))
+    # If search query not in cache
+    if cache_response.json() == {"code": 204, "msg": "no results"}:
+        location = request.args.get("location")
+        type = 0
+        if int(year) <1900 or int(year) > 2018:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Year has to be between 1900 and 2018"}), 403)
+        if event_type == "event":
+            type = 1
+        elif event_type == "birth":
+            if int(year) >= 2002:
+                return make_response(jsonify({"code": 403,
+                                              "msg": "There are no important births after 2001"}), 403)
+            type = 2
+        elif event_type == "death":
+            type = 3
+            if int(year) >= 2002:
+                type = 2
+        else:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "There needs to be an event_type"}), 403)
+
+        if not location:
+            result = output_data(year, 1, 0, type)
+        result = output_data(year, 1, 0, 1) ## for january
+        for i in range(2, 13):
+            nextMonth = output_data(year, i, 0, type)
+            ##print(nextMonth)
+            if nextMonth:
+                result.update(nextMonth)
+
+        res = r.post(cache_url, data=result)
+        return make_response(jsonify(result))
+
+    # If search query in cache
+    else:
+        return jsonify(cache_response.json())
 
 
 @app.route('/movie/top/<int:number>', methods={"GET"})

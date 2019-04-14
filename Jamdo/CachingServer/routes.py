@@ -28,107 +28,12 @@ def dump_database():
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
-@app.route('/<year>/<int:month>/<day>', methods={"GET", "POST"})
-def return_event_day(year, month, day):
+@app.route('/isCached/<string:event_type>/<year>/<int:month>/<int:day>/', methods={"GET", "POST"})
+def return_event_day(event_type, year, month, day):
     httpmethod = request.method
+
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, month=month, day=day).all()
-        if not results:
-            return jsonify({"code": 204, "msg": "no results"})
-        return make_response(jsonify([row2dict(result) for result in results]))
-
-    if httpmethod == "POST":
-        # get the year first, if no year then fail
-        year = request.args.get('year')
-        if not year:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "Cannot post event. Missing mandatory fields."}), 403)
-
-        month = request.args.get('month')
-        day = request.args.get('day')
-
-        month_dict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
-                      7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
-                      13: 'Nobel Prizes'}
-        month_name = month_dict[month]
-
-        # get the events JSON string and parse into a Python string
-        content = request.get_json
-        events = json.loads(content)
-
-        if not month and not day:
-            r = Result(year=year, event=event)
-        elif not month:
-            r = Result(year=year, event=event)
-        elif not day:
-            r = Result(year=year, month=month_name, event=event)
-        else:
-            r = Result(year=year, month=month_name, day=day, event=event)
-
-        db.session.add(r)
-        try:
-            db.session.commit()
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            error = "Cannot put person. "
-            # print(app.config.get("DEBUG"))
-            if app.config.get("DEBUG"):
-                error += str(e)
-            return make_response(jsonify({"code": 404, "msg": error}), 404)
-        return jsonify({"code": 200, "msg": "success"})
-
-
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
-@app.route('/<year>/<int:month>/', methods={"GET", "POST"})
-def return_event_month(year, month):
-    httpmethod = request.method
-    if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, month=month).all()
-        if not results:
-            return jsonify({"code": 204, "msg": "no results"})
-        return make_response(jsonify([row2dict(result) for result in results]))
-
-    if httpmethod == "POST":
-        # get the year first, if no year then fail
-        year = request.args.get('year')
-        if not year:
-            return make_response(jsonify({"code": 403,
-                                          "msg": "Cannot post event. Missing mandatory fields."}), 403)
-
-        month = request.args.get('month')
-
-        month_dict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
-                      7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
-                      13: 'Nobel Prizes'}
-
-        month_name = month_dict[month]
-
-        # get the events JSON string and parse into a Python string
-        content = request.get_json
-        event = json.loads(content)
-
-        if not month:
-            r = Result(year=year, event=event)
-        else:
-            r = Result(year=year, month=month_name, event=event)
-
-        db.session.add(r)
-        try:
-            db.session.commit()
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            error = "Cannot put person. "
-            # print(app.config.get("DEBUG"))
-            if app.config.get("DEBUG"):
-                error += str(e)
-            return make_response(jsonify({"code": 404, "msg": error}), 404)
-        return jsonify({"code": 200, "msg": "success"})
-
-
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
-@app.route('/<year>/', methods={"GET", "POST"})
-def return_event_year(year):
-    httpmethod = request.method
-    if httpmethod == "GET":
-        results = Result.query.filter_by(year=year).all()
+        results = Result.query.filter_by(year=year, month=month, day=day, type=event_type).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
@@ -137,21 +42,126 @@ def return_event_year(year):
         # get the year first, if no year then fail
         # year = request.args.get('year')
 
+        # if not year and not month and not day:
+        #     return make_response(jsonify({"code": 403,
+        #                                   "msg": "Cannot post event. Missing mandatory fields."}), 403)
+
+        # month = request.args.get('month')
+        # day = request.args.get('day')
+
+        # month_dict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+        #               7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
+        #               13: 'Nobel Prizes'}
+        # month_name = month_dict[month]
+
+        data = request.data
+        events = json.dumps(data)
+        # events = json.loads(data)
+
+        # if not month and not day:
+        #     r = Result(year=year, event=event)
+        # elif not month:
+        #     r = Result(year=year, event=event)
+        # elif not day:
+        #     r = Result(year=year, month=month_name, event=event)
+        # else:
+        #     r = Result(year=year, month=month_name, day=day, event=event)
+
+        r = Result(year=year, month=month, day=day, type=event_type, event=events)
+        db.session.add(r)
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.SQLAlchemyError as e:
+            error = "Cannot post search result. "
+            # print(app.config.get("DEBUG"))
+            if app.config.get("DEBUG"):
+                error += str(e)
+            return make_response(jsonify({"code": 404, "msg": error}), 404)
+        return jsonify({"code": 200, "msg": "success"})
+
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
+@app.route('/isCached/<string:event_type>/<year>/<int:month>/', methods={"GET", "POST"})
+def return_event_month(event_type, year, month):
+    httpmethod = request.method
+    if httpmethod == "GET":
+        results = Result.query.filter_by(year=year, month=month, type=event_type).all()
+        if not results:
+            return jsonify({"code": 204, "msg": "no results"})
+        return make_response(jsonify([row2dict(result) for result in results]))
+
+    if httpmethod == "POST":
+        # if no year then fail
+        if not year:
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Cannot post event. Missing mandatory fields."}), 403)
+
+        # month = request.args.get('month')
+
+        # month_dict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+        #               7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December',
+        #               13: 'Nobel Prizes'}
+        #
+        # month_name = month_dict[month]
+
+        data = request.data
+        events = json.dumps(data)
+
+        # if not month:
+        #     r = Result(year=year, event=event)
+        # else:
+        #     r = Result(year=year, month=month_name, event=event)
+
+        r = Result(year=year, month=month, type=event_type, event=events)
+
+        db.session.add(r)
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.SQLAlchemyError as e:
+            error = "Cannot post search result. "
+            # print(app.config.get("DEBUG"))
+            if app.config.get("DEBUG"):
+                error += str(e)
+            return make_response(jsonify({"code": 404, "msg": error}), 404)
+        return jsonify({"code": 200, "msg": "success"})
+
+
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
+@app.route('/isCached/<string:event_type>/<year>/', methods={"GET", "POST"})
+def return_event_year(event_type, year):
+    httpmethod = request.method
+
+    if httpmethod == "GET":
+        results = Result.query.filter_by(year=year, type=event_type).all()
+        if not results:
+            return jsonify({"code": 204, "msg": "no results"})
+        return make_response(jsonify([row2dict(result) for result in results]))
+
+    if httpmethod == "POST":
+        # get the year first, if no year then fail
+
         if not year:
             return make_response(jsonify({"code": 403,
                                           "msg": "Cannot post event. Missing mandatory fields."}), 403)
 
         # get the events JSON string and parse into a Python string
+        # content = request.data
+        # event_dict = json.loads(content)
+        # event = event_dict["event_string"]
 
-        content = request.get_json
-        event = json.loads(content)
-
-        r = Result(year=year, event=event)
+        data = request.get_data()
+        data = data.decode('utf8').replace('([+&%])', " ")
+        # json_data = json.loads(events)
+        # s = json.dumps(json_data)
+        # events = json.dumps(data)
+        # print(data)
+        print(data)
+        r = Result(year=year, type=event_type, event=data)
         db.session.add(r)
         try:
             db.session.commit()
         except sqlalchemy.exc.SQLAlchemyError as e:
-            error = "Cannot put person. "
+            error = "Cannot post search result. "
             # print(app.config.get("DEBUG"))
             if app.config.get("DEBUG"):
                 error += str(e)
