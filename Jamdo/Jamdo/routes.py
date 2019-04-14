@@ -21,7 +21,7 @@ def getJAMDO():
       flash("Date Input Cannot be Blank ", "danger")
       return make_response(render_template('homepage.html', inputError="something"),500)
 
-    x=re.search("^([12]\d{3}(-(0[1-9]|1[0-2]))*)(-(0[1-9]|[12]\d|3[01]))*$",client_date)
+    x=re.search("^([12]\d{3}(-(0[1-9]|1[0-2]))*)(-(0[1-9]|[12]\d|3[01]))*$",client_date) #regex for yyyy-mm-dd, yyyy-mm and yyyy only
 
     if (not x):
       flash("Invalid Date Format YYYY-MM-DD , YYYY-MM or YYYY only", "danger")
@@ -30,7 +30,7 @@ def getJAMDO():
     if(len(client_date) < 8 and len(client_date) > 5): #month year only 
       year =client_date.split("-")[0]
       month= client_date.split("-")[1]
-    elif(len(client_date) == 4):
+    elif(len(client_date) == 4): #year only
       year = str(client_date)
 
     else: #full date
@@ -42,7 +42,17 @@ def getJAMDO():
     data = ''
 
     ### check caching server for data ###
-    # cache_check = request.get('http://127.0.0.1:7000/year/month/day')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year/month/day')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year/month/day')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year/month/day')
+
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year/month')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year/month')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year/month')
+
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year')
+    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year')
     # cache = cache_check.json()
     cache = {}
     cache['hit'] = 'False'
