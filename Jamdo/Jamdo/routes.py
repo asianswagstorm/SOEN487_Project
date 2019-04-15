@@ -11,27 +11,31 @@ def getJAMDO():
     httpMethod = request.method
     today = str(date.today())  # yyyy-mm-dd
 
-    if 'username' in session:  
+    if 'username' in session and 'fname' in session and 'lname' in session :  
       username = session["username"]
+      fname = session["fname"]
+      lname = session["lname"]
     else:  
-      username = '';  
+      username = ''
+      fname = ''
+      lname = ''
 
     if httpMethod == 'GET':
-        return render_template('homepage.html', today=today, username=username)
+        return render_template('homepage.html', today=today,fname = fname , lname = lname, username=username)
 
     elif httpMethod == 'POST':
         client_date = request.form.get('date')  # yyyy-mm-dd
 
         if (not client_date):
             flash("Date Input Cannot be Blank ", "danger")
-            return make_response(render_template('homepage.html', inputError="something", username=username), 500)
+            return make_response(render_template('homepage.html', inputError="something",fname = fname , lname = lname, username=username), 500)
 
         x = re.search("^([12]\d{3}(-(0[1-9]|1[0-2]))*)(-(0[1-9]|[12]\d|3[01]))*$",
                       client_date)  # regex for yyyy-mm-dd, yyyy-mm and yyyy only
 
         if (not x):
             flash("Invalid Date Format YYYY-MM-DD , YYYY-MM or YYYY only", "danger")
-            return make_response(render_template('homepage.html', inputError="something", username=username), 500)
+            return make_response(render_template('homepage.html', inputError="something",fname = fname , lname = lname, username=username), 500)
 
         if (len(client_date) < 8 and len(client_date) > 5):  # month year only
             year = client_date.split("-")[0]
@@ -77,22 +81,7 @@ def getJAMDO():
             events = cache_check3.json()
 
         no_cache_hit = {"code": 204, "msg": "no results"}
-        # if (deaths == {} or births == {} or events == {}) :
-        # cache['hit'] = 'False'
-        # cache['data'] = 'akldaf;j'
-
-
-        # Instance is a list when the data is found from a cache
-        # if (isinstance(deaths, list) and isinstance(births, list) and isinstance(events, list)):  # if type is list
-        #     # cache['hit'] = 'True'
-        #     # data = cache['data']
-        #     return render_template('results.html', births=births, deaths=deaths, events=events)
-        #
-        #     ### get data from resource server ### if the instance is a dict that means it was not found in the caching server, we will than get from the resource gathering.
-        # elif (isinstance(deaths, dict) and isinstance(births, dict) and isinstance(events, dict)):  # if type is dict
-        #     cookie = {'token': SERVER_TOKEN}
-
-        # if deaths == no_cache_hit or births == no_cache_hit or events == no_cache_hit:
+      
         if deaths == births == events == no_cache_hit:
             cookie = {'token': SERVER_TOKEN}
             print("no cache hit")
@@ -125,7 +114,7 @@ def getJAMDO():
             else:
                 get_resource_birth = ext_request.get('http://127.0.0.1:3000/birth/' + year + '/' + month + '/' + day,
                                                      cookies=cookie)
-
+                                                     
             births = get_resource_birth.json()
 
             ext_request = requests.Session()
@@ -142,13 +131,13 @@ def getJAMDO():
                                                      cookies=cookie)
             events = get_resource_event.json()
 
-            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "resource"}, username=username)
+            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "resource"}, fname = fname , lname = lname, username=username)
 
         elif deaths != no_cache_hit or births != no_cache_hit or events != no_cache_hit:
             print("cache hit")
-            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "cache"}, username=username)
+            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "cache"}, fname = fname , lname = lname, username=username)
         else:
-            return render_template('error.html', message='Cache error', username=username)
+            return render_template('error.html', message='Cache error', fname = fname , lname = lname, username=username)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -168,6 +157,8 @@ def login():
             flash("User " + username + " not found in DB", "danger")
             return make_response(render_template('login.html', inputError="Login"), 404)
         user = User.query.filter_by(username=username).first()
+        fname = user.fname
+        lname = user.lname
         if (not bcrypt.check_password_hash(user.password, password)):  # user.password != password
             flash("Incorrect password", "danger")
             return make_response(render_template('login.html', inputError="Login"), 401)  # unauthorize status code
@@ -180,9 +171,11 @@ def login():
         session["token"] = token.decode(
             'UTF-8')  # causes problems {'authentication': {'message': 'Unrecognized Token', 'payload': 'None', 'status': 'fail'}}
         session["username"] = username
+        session["fname"] = fname
+        session["lname"] = lname
 
         # return jsonify({'token' : token.decode('UTF-8')})
-        return make_response(render_template('homepage.html', username=username), 200)
+        return make_response(render_template('homepage.html', fname = fname , lname = lname, username=username), 200)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -213,8 +206,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         session["username"] = username
-        return make_response(render_template('homepage.html', username=username), 200)
-
+        return make_response(render_template('homepage.html', fname = fname , lname = lname, username=username), 200)
 
 @app.route('/logout')
 def logout():

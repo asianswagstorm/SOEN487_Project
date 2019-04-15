@@ -2,6 +2,7 @@
     <ul>
         <li class="active"><a href="/">Homepage</a></li>
         {% if username %}
+        <li><p> Logged in as {{username}}</p></li>
         <li><a href="logout">Logout</a></li>
         {% else%}
         <li><a href="login">Login</a></li>

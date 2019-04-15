@@ -8,7 +8,7 @@
     <div id="banner" class="container">
         <section>
             {% if username %}
-            <p>Hello <strong>{{username}}</strong></p>
+            <p>Hello <strong>{{fname}} {{lname}}</strong></p>
             {% endif%}
             {% if inputError %}
             <a href="/" class="button medium">{% include "includes/__messages__.html "%}</a>
