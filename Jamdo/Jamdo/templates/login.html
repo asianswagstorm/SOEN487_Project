@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{%block content%}
+<!-- Wrapper -->
+<div class="wrapper style1">
+    <!-- Banner -->
+ <div class="login">
+    <form method="post">
+        {% if inputError %}
+		<a href="login" class="button medium">{% include "includes/__messages__.html "%}</a>
+    	 {% endif %}
+        <input type="text" name="u" placeholder="Username" required="required" />
+        <input type="password" name="p" placeholder="Password" required="required" />
+       
+	   	<ul class="actions">
+		<li>
+		 <button type="submit" class="button">Login.</button>
+		</li>
+		</ul>
+	   
+    </form>
+</div>
+    <!-- Extra -->
+    <div id="extra">
+        <div class="container">
+        </div>
+    </div>
+</div>
+{%endblock%}
+

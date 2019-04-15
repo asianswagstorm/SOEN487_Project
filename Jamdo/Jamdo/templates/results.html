@@ -1,0 +1,15 @@
+{%extends 'layout.html'%}
+
+{%block content%}
+<ul class='results_container'>
+	 {% if comingFrom %}
+            <strong><li >{{comingFrom}}</li> </strong>
+     {% endif%}
+	<li class="results_births">{{births}}</li>
+	<li class="results_deaths">{{deaths}}</li>
+	<li class="results_events">{{events}}</li>
+</ul>
+
+{% include "includes/_async.html"%}
+
+{%endblock%}
