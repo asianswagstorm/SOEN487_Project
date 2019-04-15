@@ -205,7 +205,10 @@ def register():
         new_user = User(max_id + 1, fname, lname, username, pw_hash)
         db.session.add(new_user)
         db.session.commit()
+        
         session["username"] = username
+        session["fname"] = fname
+        session["lname"] = lname
         return make_response(render_template('homepage.html', fname = fname , lname = lname, username=username), 200)
 
 @app.route('/logout')
