@@ -138,11 +138,11 @@ def getJAMDO():
                                                      cookies=cookie)
             events = get_resource_event.json()
 
-            return render_template('results.html', births=births, deaths=deaths, events=events)
+            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "resource"})
 
         elif deaths != no_cache_hit or births != no_cache_hit or events != no_cache_hit:
             print("cache hit")
-            return render_template('results.html', births=births, deaths=deaths, events=events)
+            return render_template('results.html', births=births, deaths=deaths, events=events, comingFrom={"from": "cache"})
         else:
             return render_template('error.html', message='Cache error')
 
