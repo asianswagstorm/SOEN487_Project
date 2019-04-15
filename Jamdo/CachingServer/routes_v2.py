@@ -166,14 +166,14 @@ def return_event_year(event_type, year):
         # event_dict = json.loads(content)
         # event = event_dict["event_string"]
         body = json.loads(str(request.data, "utf8"))
-        #data = request.get_data()
+        data = request.get_data()
         #data = data.decode('utf8').replace('([+&%])', " ")
         # json_data = json.loads(events)
         # s = json.dumps(json_data)
         # events = json.dumps(data)
         # print(data)
         print(body)
-        r = Result(year=year, type=event_type, event=body)
+        r = Result(year=year, type=event_type, event=data)
         db.session.add(r)
         try:
             db.session.commit()

@@ -14,7 +14,8 @@ app = Flask(__name__)									# Enable flask application
 app.config.from_object(Config)
 bcrypt = Bcrypt(app)
 
-from routes import *
+# from routes import *
+from routes2 import *
 
 #register server with Auth Server
 from authentication import getAuthToken

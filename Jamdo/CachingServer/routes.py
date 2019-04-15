@@ -55,7 +55,6 @@ def return_event_day(event_type, year, month, day):
         # month_name = month_dict[month]
 
         data = request.data
-        events = json.dumps(data)
         # events = json.loads(data)
 
         # if not month and not day:
@@ -67,7 +66,7 @@ def return_event_day(event_type, year, month, day):
         # else:
         #     r = Result(year=year, month=month_name, day=day, event=event)
 
-        r = Result(year=year, month=month, day=day, type=event_type, event=events)
+        r = Result(year=year, month=month, day=day, type=event_type, event=data)
         db.session.add(r)
         try:
             db.session.commit()
@@ -85,7 +84,7 @@ def return_event_day(event_type, year, month, day):
 def return_event_month(event_type, year, month):
     httpmethod = request.method
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, month=month, type=event_type).all()
+        results = Result.query.filter_by(year=year, month=month, day=None, type=event_type).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
@@ -105,14 +104,13 @@ def return_event_month(event_type, year, month):
         # month_name = month_dict[month]
 
         data = request.data
-        events = json.dumps(data)
 
         # if not month:
         #     r = Result(year=year, event=event)
         # else:
         #     r = Result(year=year, month=month_name, event=event)
 
-        r = Result(year=year, month=month, type=event_type, event=events)
+        r = Result(year=year, month=month, type=event_type, event=data)
 
         db.session.add(r)
         try:
@@ -132,7 +130,7 @@ def return_event_year(event_type, year):
     httpmethod = request.method
 
     if httpmethod == "GET":
-        results = Result.query.filter_by(year=year, type=event_type).all()
+        results = Result.query.filter_by(year=year, month=None, day=None, type=event_type).all()
         if not results:
             return jsonify({"code": 204, "msg": "no results"})
         return make_response(jsonify([row2dict(result) for result in results]))
@@ -150,7 +148,6 @@ def return_event_year(event_type, year):
         # event = event_dict["event_string"]
 
         data = request.get_data()
-        data = data.decode('utf8').replace('([+&%])', " ")
         # json_data = json.loads(events)
         # s = json.dumps(json_data)
         # events = json.dumps(data)

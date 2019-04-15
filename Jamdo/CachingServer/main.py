@@ -8,7 +8,8 @@ app = Flask(__name__)
 app.config.from_object(DevConfig)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-from routes import *
+# from routes import *
+from routes_v2 import *
 with app.app_context():
     db.init_app(app)									# removes cyclic dependency??
     db.create_all()
