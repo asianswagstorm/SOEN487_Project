@@ -2,6 +2,9 @@ from flask import request
 from flask import render_template, make_response
 from flask import redirect
 from flask import jsonify, json
+from random import *
+from sqlalchemy.orm import load_only
+
 
 import datetime
 import sqlalchemy
@@ -28,7 +31,7 @@ def dump_database():
     return jsonify([row2dict(result) for result in result_list])
 
 
-# Delete entire database
+# Clear cache
 @app.route('/deleteDatabase', methods={"GET"})
 def delete_database():
     db.session.query(Result).delete()
@@ -42,6 +45,16 @@ def add_database():
     db.session.add(Result(year=1333, month=2, day=2, type="birth", event="It is WORKING"))
     db.session.commit()
     return "Adding"
+
+
+# Get random row from cache
+@app.route('/isCached/getRandomRow', methods={"GET"})
+def get_random_row():
+    random_row = Result.query.filter_by(id=randint(1, Result.query.count()))
+    if not random_row:
+        return jsonify({"code": 204, "msg": "no results"})
+    else:
+        return jsonify([row2dict(result) for result in random_row])
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
@@ -83,7 +96,9 @@ def return_event_day(event_type, year, month, day):
         # else:
         #     r = Result(year=year, month=month_name, day=day, event=event)
 
-        r = Result(year=year, month=month, day=day, type=event_type, event=body)
+        # r = Result(year=year, month=month, day=day, type=event_type, event=body)
+        r = Result(year=year, month=month, day=day, type=event_type, event=request.data)
+
         db.session.add(r)
         try:
             db.session.commit()
@@ -129,7 +144,8 @@ def return_event_month(event_type, year, month):
         # else:
         #     r = Result(year=year, month=month_name, event=event)
 
-        r = Result(year=year, month=month, type=event_type, event=body)
+        # r = Result(year=year, month=month, type=event_type, event=body)
+        r = Result(year=year, month=month, type=event_type, event=request.data)
         #db.session.add(Result(year=1333, month=2, type="death", event=body))
         db.session.add(r)
         try:
