@@ -72,7 +72,6 @@ def getJAMDO():
                 'http://127.0.0.1:5000/isCached/event/' + year + '/' + month + '/' + day)
             events = cache_check3.json()
 
-        cache_hit = {"code": 200, "msg": "success"}
         no_cache_hit = {"code": 204, "msg": "no results"}
         # if (deaths == {} or births == {} or events == {}) :
         # cache['hit'] = 'False'
@@ -89,9 +88,10 @@ def getJAMDO():
         # elif (isinstance(deaths, dict) and isinstance(births, dict) and isinstance(events, dict)):  # if type is dict
         #     cookie = {'token': SERVER_TOKEN}
 
-        if (deaths == no_cache_hit or births == no_cache_hit or events == no_cache_hit) :
+        # if deaths == no_cache_hit or births == no_cache_hit or events == no_cache_hit:
+        if deaths == births == events == no_cache_hit:
             cookie = {'token': SERVER_TOKEN}
-
+            print("no cache hit")
             # Authenticate token at other end
 
             ext_request = requests.Session()
@@ -140,8 +140,8 @@ def getJAMDO():
 
             return render_template('results.html', births=births, deaths=deaths, events=events)
 
-
-        elif (deaths == cache_hit or births == cache_hit or events == cache_hit):
+        elif deaths != no_cache_hit or births != no_cache_hit or events != no_cache_hit:
+            print("cache hit")
             return render_template('results.html', births=births, deaths=deaths, events=events)
         else:
             return render_template('error.html', message='Cache error')
