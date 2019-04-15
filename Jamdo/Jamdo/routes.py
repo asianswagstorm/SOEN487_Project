@@ -42,31 +42,44 @@ def getJAMDO():
     data = ''
 
     ### check caching server for data ###
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year/month/day')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year/month/day')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year/month/day')
-
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year/month')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year/month')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year/month')
-
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/death/year')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/birth/year')
-    # cache_check = request.get('http://127.0.0.1:5000/isCached/event/year')
-    # cache = cache_check.json()
-    cache = {}
-    cache['hit'] = 'False'
-    cache['data'] = 'akldaf;j'
+   
+    if(len(client_date) < 8 and len(client_date) > 5):
+     cache_check1 =  requests.Session().get('http://127.0.0.1:5000/isCached/death/' + year + '/' + month)
+     deaths = cache_check1.json()
+     cache_check2 =  requests.Session().get('http://127.0.0.1:5000/isCached/birth/' + year + '/' + month)
+     births = cache_check2.json()
+     cache_check3 =  requests.Session().get('http://127.0.0.1:5000/isCached/event/' + year + '/' + month)
+     events = cache_check3.json()
     
-    # get data from cache server
-    if cache['hit'] == 'True':
-      data = cache['data']
+    elif(len(client_date) == 4):
+     cache_check1 =  requests.Session().get('http://127.0.0.1:5000/isCached/death/' + year)
+     deaths = cache_check1.json()
+     cache_check2 =  requests.Session().get('http://127.0.0.1:5000/isCached/birth/' + year)
+     births = cache_check2.json()
+     cache_check3 =  requests.Session().get('http://127.0.0.1:5000/isCached/event/' + year)
+     events = cache_check3.json()
+    
+    else:
+     cache_check1 =  requests.Session().get('http://127.0.0.1:5000/isCached/death/' + year + '/' + month + '/' + day)
+     deaths = cache_check1.json()
+     cache_check2 =  requests.Session().get('http://127.0.0.1:5000/isCached/birth/' + year + '/' + month + '/' + day)
+     births = cache_check2.json()
+     cache_check3 =  requests.Session().get('http://127.0.0.1:5000/isCached/event/' + year + '/' + month + '/' + day)
+     events = cache_check3.json()
+
+    #if (deaths == {} or births == {} or events == {}) :
+     #cache['hit'] = 'False'
+    # cache['data'] = 'akldaf;j'
+    #Instance is a list when the data is found from a cache
+    if (isinstance(deaths, list) and isinstance(births, list) and isinstance(events, list) ) : #if type is list
+     # cache['hit'] = 'True'
+      #data = cache['data']
       return render_template('results.html', births=births, deaths=deaths, events=events)         
     
-    ### get data from resource server ###
-    elif cache['hit'] == 'False':
+    ### get data from resource server ### if the instance is a dict that means it was not found in the caching server, we will than get from the resource gathering. 
+    elif (isinstance(deaths, dict) and isinstance(births, dict) and isinstance(events, dict) ) : #if type is dict 
       cookie = {'token':SERVER_TOKEN}
-      
+     
       # Authenticate token at other end
       
       ext_request = requests.Session()
@@ -133,11 +146,11 @@ def login():
    flash("Incorrect password", "danger")
    return make_response(render_template('login.html', inputError="Login"),401) #unauthorize status code
 
-  #Create token conditions passed ???
-  #token = jwt.encode({'iss': "http://localhost:9000/" , 'id' : user.id,'username' : username, 'iat': datetime.datetime.utcnow(), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)} ,app.config["SECRET_KEY"])
-  
+  #Create token conditions passed #payload
+  token = jwt.encode({'iss': "http://localhost:9000/authenticate" , 'id' : user.id, 'username' : username, 'status' : "success" , 'iat': datetime.datetime.utcnow(), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1)} ,app.config["SECRET_KEY"])
+  session["token"] = token.decode('UTF-8') #causes problems {'authentication': {'message': 'Unrecognized Token', 'payload': 'None', 'status': 'fail'}}
   session["username"] = username
-  #session["token"] = token.decode('UTF-8') #causes problems {'authentication': {'message': 'Unrecognized Token', 'payload': 'None', 'status': 'fail'}}
+  
   #return jsonify({'token' : token.decode('UTF-8')})
   return make_response(render_template('homepage.html', username = username), 200)   
 
