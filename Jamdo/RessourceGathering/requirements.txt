@@ -1,0 +1,9 @@
+Flask
+jsonify
+make_response 
+requests 
+url_for
+redirect
+json
+sqlalchemy
+mwparserfromhell
