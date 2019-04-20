@@ -1,7 +1,7 @@
 import unittest
 import json
 from main import app as tested_app
-from main import db as tested_db
+from routes_v2 import db as tested_db
 from config import TestConfig
 from models import Result
 
@@ -13,8 +13,10 @@ class TestResult(unittest.TestCase):
         # set up the test DB
         self.db = tested_db
         self.db.create_all()
-        self.db.session.add(Result(id=1, name="Alice"))
-        self.db.session.add(Result(id=2, name="Bob"))
+        self.db.session.add(Result(year=1994, type="birth", event="Alice"))
+        self.db.session.add(Result(year=1995, type="birth", event="Bob"))
+        self.db.session.add(Result(year=1996, month=1, type="birth", event="John"))
+        self.db.session.add(Result(year=1997, month=2, day=1, type="birth", event="Ann"))
         self.db.session.commit()
 
         self.app = tested_app.test_client()
@@ -24,25 +26,72 @@ class TestResult(unittest.TestCase):
         Result.query.delete()
         self.db.session.commit()
 
-    def test_get_person_with_valid_id(self):
+    def test_get_all_results(self):
         # send the request and check the response status code
-        response = self.app.get("/person/1")
+        response = self.app.get("/showDatabase")
         self.assertEqual(response.status_code, 200)
 
         # convert the response data from json and call the asserts
-        person = json.loads(str(response.data, "utf8"))
-        self.assertDictEqual(person, {"id": "1", "name": "Alice"})
+        result_list = json.loads(str(response.data, "utf8"))
+        self.assertEqual(type(result_list ), list)
+        self.assertDictEqual(result_list [0], {"year": "1994", "event": "Alice"})
+        self.assertDictEqual(result_list [1], {"year": "1995", "event": "Bob"})
 
-    def test_get_person_with_invalid_id(self):
+    def test_get_result_with_valid_year(self):
         # send the request and check the response status code
-        response = self.app.get("/person/1000000")
+        response = self.app.get("/isCached/birth/1994")
+        self.assertEqual(response.status_code, 200)
+
+        # convert the response data from json and call the asserts
+        result = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(result, {"year": "1994", "type": "birth", "event": "Alice"})
+
+    def test_get_result_with_invalid_year(self):
+        # send the request and check the response status code
+        response = self.app.get("/isCached/birth/2000")
         self.assertEqual(response.status_code, 404)
 
         # convert the response data from json and call the asserts
         body = json.loads(str(response.data, "utf8"))
-        self.assertDictEqual(body, {"code": 404, "msg": "Cannot find this person id."})
+        self.assertDictEqual(body, {"code": 404, "msg": "Cannot find this result."})
 
-    def test_post_person_without_id(self):
+    def test_get_result_with_valid_month(self):
+        # send the request and check the response status code
+        response = self.app.get("/isCached/birth/1996/1/")
+        self.assertEqual(response.status_code, 200)
+
+        # convert the response data from json and call the asserts
+        result = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(result, {"year": "1996", "month": "1", "type": "birth", "event": "John"})
+
+    def test_get_result_with_invalid_month(self):
+        # send the request and check the response status code
+        response = self.app.get("/isCached/birth/1996/5/")
+        self.assertEqual(response.status_code, 404)
+
+        # convert the response data from json and call the asserts
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 404, "msg": "Cannot find this result."})
+
+    def test_get_result_with_valid_day(self):
+        # send the request and check the response status code
+        response = self.app.get("/isCached/birth/1997/2/1/")
+        self.assertEqual(response.status_code, 200)
+
+        # convert the response data from json and call the asserts
+        result = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(result, {"year": "1997", "month": "2", "day": "1", "type": "birth", "event": "Ann"})
+
+    def test_get_result_with_invalid_day(self):
+        # send the request and check the response status code
+        response = self.app.get("/isCached/birth/1997/2/2/")
+        self.assertEqual(response.status_code, 404)
+
+        # convert the response data from json and call the asserts
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 404, "msg": "Cannot find this result."})
+
+    def test_post_result_without_id(self):
         # do we really need to check counts?
         initial_count = Result.query.filter_by(name="Dan").count()
 
