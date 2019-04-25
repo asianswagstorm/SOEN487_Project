@@ -26,9 +26,8 @@ class TestApp(unittest.TestCase):
 
         # convert the response data from json and call the asserts
         body = json.loads(str(response.data, "utf8"))
-        self.assertEqual(body["title"], "SOEN487 Assignment 1")
-        student = body["student"]
-        self.assertDictEqual(student, {"id": "27181000", "name": "Olivier Mercier-Peetz"})
+        self.assertEqual(body["microservice"], "resource gathering")
+
 
 
 
