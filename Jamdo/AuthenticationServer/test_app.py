@@ -18,7 +18,8 @@ class TestApp(unittest.TestCase):
     def test_main_page(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"microservice": "Authentication Server"})
     def test_404_on_invalid_url(self):
         # send the request and check the response status code
         response = self.app.get("/something")
