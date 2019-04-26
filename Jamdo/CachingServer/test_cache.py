@@ -29,11 +29,9 @@ class TestResult(unittest.TestCase):
             db.session.commit()
 
     def test_get_valid_result_year(self):
-        # send the request and check the response status code
         response = self.app.get("/isCached/death/2002/")
         self.assertEqual(response.status_code, 200)
 
-        # convert the response data from json and call the asserts
         result_list = json.loads(str(response.data, "utf8"))
         self.assertEqual(type(result_list), list)
         self.assertDictEqual(result_list[0], {"id": "2", "year": "2002", "month": "11", "day": "22", "type": "death", "event": "Bob died."})
