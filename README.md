@@ -1,4 +1,4 @@
-# SOEN487_Project
+# JAMDO
 Private Repo for SOEN 487 Web Services Class Written in Flask
 
 General project description:
