@@ -33,9 +33,9 @@ class TestResult(unittest.TestCase):
 
         # convert the response data from json and call the asserts
         result_list = json.loads(str(response.data, "utf8"))
-        self.assertEqual(type(result_list ), list)
-        self.assertDictEqual(result_list [0], {"year": "1994", "event": "Alice"})
-        self.assertDictEqual(result_list [1], {"year": "1995", "event": "Bob"})
+        self.assertEqual(type(result_list), list)
+        self.assertDictEqual(result_list[0], {"year": "1994", "event": "Alice"})
+        self.assertDictEqual(result_list[1], {"year": "1995", "event": "Bob"})
 
     def test_get_result_year_with_valid_year(self):
         # send the request and check the response status code
