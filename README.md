@@ -30,7 +30,7 @@ Instructions to run:
 
 Contributors:
 - James Edwards, jamesedwards1394@gmail.com
-- Andy Nguyen
+- Andy Nguyen, nguyen.andy123@gmail.com
 - Manuel Toca
 - Nguyen Dinh
 - Olivier Mercier Peetz
