@@ -1,30 +1,31 @@
 import unittest
 import json
 from main import app as tested_app
-from routes_v2 import db as tested_db
+#from routes_v2 import db as tested_db
 from config import TestConfig
-from models import Result
+from models import Result, db
 
 tested_app.config.from_object(TestConfig)
 
 
 class TestResult(unittest.TestCase):
     def setUp(self):
-        # set up the test DB
-        self.db = tested_db
-        self.db.create_all()
-        self.db.session.add(Result(year=1994, type="birth", event="Alice"))
-        self.db.session.add(Result(year=1995, type="birth", event="Bob"))
-        self.db.session.add(Result(year=1996, month=1, type="birth", event="John"))
-        self.db.session.add(Result(year=1997, month=2, day=1, type="birth", event="Ann"))
-        self.db.session.commit()
-
         self.app = tested_app.test_client()
+        self.main = tested_app.app_context()
+        with tested_app.app_context():
+            db.init_app(tested_app)  # removes cyclic dependency??
+            db.create_all()
+            db.session.add(Result(year=1994, type="birth", event="Alice"))
+            db.session.add(Result(year=1995, type="death", event="Bob"))
+            db.session.add(Result(year=1996, month=1, type="birth", event="John"))
+            db.session.add(Result(year=1997, month=2, day=1, type="birth", event="Ann"))
+            db.session.commit()
 
     def tearDown(self):
         # clean up the DB after the tests
-        Result.query.delete()
-        self.db.session.commit()
+        with tested_app.app_context():
+            Result.query.delete()
+            db.session.commit()
 
     def test_dump_database(self):
         # send the request and check the response status code
@@ -34,21 +35,24 @@ class TestResult(unittest.TestCase):
         # convert the response data from json and call the asserts
         result_list = json.loads(str(response.data, "utf8"))
         self.assertEqual(type(result_list), list)
-        self.assertDictEqual(result_list[0], {"year": "1994", "event": "Alice"})
-        self.assertDictEqual(result_list[1], {"year": "1995", "event": "Bob"})
+        self.assertDictEqual(result_list[0], {'id': '1', 'year': '1994', 'day': 'None', 'month': 'None',
+                                              'type': 'birth', 'event': 'Alice'})
+        self.assertDictEqual(result_list[1], {'id': '2', 'year': '1995', 'month': 'None', 'day': 'None',
+                                              'type': 'death', 'event': 'Bob'})
 
-    def test_get_result_year_with_valid_year(self):
+    def test_get_event_year_with_valid_year(self):
         # send the request and check the response status code
-        response = self.app.get("/isCached/birth/1994")
+        response = self.app.get("/isCached/birth/1994/")
         self.assertEqual(response.status_code, 200)
 
         # convert the response data from json and call the asserts
         result = json.loads(str(response.data, "utf8"))
-        self.assertDictEqual(result, {"year": "1994", "type": "birth", "event": "Alice"})
+        self.assertDictEqual(result, {'id': '1', 'year': '1994', 'day': 'None', 'month': 'None', 'type': 'birth',
+                                      'event': 'Alice'})
 
     def test_get_event_year_with_invalid_year(self):
         # send the request and check the response status code
-        response = self.app.get("/isCached/birth/2000")
+        response = self.app.get("/isCached/birth/2000/")
         self.assertEqual(response.status_code, 204)
 
         # convert the response data from json and call the asserts
