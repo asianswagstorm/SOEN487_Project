@@ -38,12 +38,6 @@ def resource_gathering():
 @app.route('/<string:event_type>/<year>/<int:month>/<day>', methods={"GET"})
 def return_event_day(event_type, year, month, day):
 
-    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/" + str(month) + "/" + day + "/"
-    r = requests.Session()
-    cache_response = r.get(cache_url)
-
-    # If search query not in cache
-    if cache_response.json() == {"code": 204, "msg": "no results"}:
         location = request.args.get("location")
 
         type = 0
@@ -81,27 +75,20 @@ def return_event_day(event_type, year, month, day):
         if key in result:
             # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
             r = requests.Session()
-            r.post(cache_url, data=json.dumps(result[key]))
             return make_response(jsonify({key: result[key]}))
         else:
             return make_response(jsonify({"code": 404,
                                           "msg": "There is no information for that date"}), 403)
     # If search query in cache
-    else:
-        return jsonify(cache_response.json())
-        #return "There already"
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
 def return_event_month(event_type, year, month):
 
-    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/" + str(month) + "/"
-    r = requests.Session()
-    cache_response = r.get(cache_url)
 
     # If search query not in cache
-    if cache_response.json() == {"code": 204, "msg": "no results"}:
+
         location = request.args.get("location")
         type = 0
         if int(year) < 1900 or int(year) > 2018 or month > 12 or month < 1:
@@ -126,22 +113,15 @@ def return_event_month(event_type, year, month):
         result = output_data(year, month, 0, type)
 
         result1 = json.dumps(result)
-        res = r.post(cache_url, data=result1)
+
         return make_response(jsonify(result))
-    else:
-        return jsonify(cache_response.json())
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected year in JSON format
 @app.route('/<string:event_type>/<year>/', methods={"GET"})
 def return_event_year(event_type, year):
 
-    cache_url = "http://127.0.0.1:5000/isCached/" + event_type + "/" + year + "/"
-    r = requests.Session()
-    cache_response = r.get(cache_url)
 
-    # If search query not in cache
-    if cache_response.json() == {"code": 204, "msg": "no results"}:
         location = request.args.get("location")
         type = 0
         if int(year) <1900 or int(year) > 2018:
@@ -171,14 +151,12 @@ def return_event_year(event_type, year):
             if nextMonth:
                 result.update(nextMonth)
         result1 = json.dumps(result)
-        res = r.post(cache_url, data=result1)
+
         return make_response(jsonify(result))
-
     # If search query in cache
-    else:
-        return jsonify(cache_response.json())
 
 
+# did not use this feature in the project
 @app.route('/movie/top/<int:number>', methods={"GET"})
 def return_top_movies(number):
     if number <= 0 or number > 200:
