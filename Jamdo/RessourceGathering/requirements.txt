@@ -1,7 +1,6 @@
 Flask
 jsonify
 requests
-redirect
 json
 sqlalchemy
 mwparserfromhell
