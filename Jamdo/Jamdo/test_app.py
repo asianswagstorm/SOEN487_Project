@@ -1,7 +1,9 @@
 import unittest
 import json
+from routes import *
+from config import TestConfig
 from main import app as tested_app
-from main import TestConfig
+
 
 tested_app.config.from_object(TestConfig)
 

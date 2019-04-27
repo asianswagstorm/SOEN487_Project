@@ -22,4 +22,6 @@ class DevConfig(Config):
 
 class TestConfig(Config):
     TESTING = True
+    SERVER_AUTH_NAME = 'application'
+    SERVER_AUTH_PASSWORD = 'APPLICATION_SERVER_PASSWORD'
     SQLALCHEMY_DATABASE_URI = r"sqlite:///../tests/test_Users.sqlite"
