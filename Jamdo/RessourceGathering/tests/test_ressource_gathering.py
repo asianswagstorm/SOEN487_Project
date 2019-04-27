@@ -1,6 +1,6 @@
 import unittest
 import json
-from tests.test_main import app as tested_app
+from main import app as tested_app
 from config import TestConfig
 
 
@@ -22,7 +22,7 @@ class TestResourceGathering(unittest.TestCase):
 
     def test_INVALID_MONTH_INPUT_for_year_month_day_fetch(self):
         # send the request and check the response status code
-        response = self.app.get("/death/1948/13/1")
+        response = self.app.get("/death/1948/13/1")#month has invalid input (13)
         self.assertEqual(response.status_code, 403)
 
         # convert the response data from json and call the asserts
@@ -32,7 +32,7 @@ class TestResourceGathering(unittest.TestCase):
 
     def test_INVALID_YEAR_INPUT_for_year_month_day_fetch(self):
         # send the request and check the response status code
-        response = self.app.get("/death/1700/10/1")
+        response = self.app.get("/death/1700/10/1")#year has invalid input (1700)
         self.assertEqual(response.status_code, 403)
 
         # convert the response data from json and call the asserts
@@ -42,13 +42,44 @@ class TestResourceGathering(unittest.TestCase):
 
     def test_INVALID_DAY_INPUT_for_year_month_day_fetch(self):
         # send the request and check the response status code
-        response = self.app.get("/death/1948/11/35")
+        response = self.app.get("/death/1948/11/35")#day has invalid input (1700)
         self.assertEqual(response.status_code, 403)
 
         # convert the response data from json and call the asserts
 
         body = json.loads(str(response.data, "utf8"))
         self.assertDictEqual(body, {"code": 403, "msg": "Wrong input of Year, Month or Day"})
+
+    def test_INVALID_STRING_INPUT_for_year_month_day_fetch(self):
+        # send the request and check the response status code
+        response = self.app.get("/death/1948/bob/35")#month has invalid input ("bob")
+        self.assertEqual(response.status_code, 403)
+
+        # convert the response data from json and call the asserts
+
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 403, "msg": "Input has to be digits for year, month, day"})
+
+    def test_INVALID_STRING_INPUT_for_year_month_fetch(self):
+        # send the request and check the response status code
+        response = self.app.get("/death/1948/bob/")#month has invalid input ("bob")
+        self.assertEqual(response.status_code, 403)
+
+        # convert the response data from json and call the asserts
+
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 403, "msg": "Input has to be digits for year, month"})
+
+    def test_INVALID_STRING_INPUT_for_year_month_fetch(self):
+        # send the request and check the response status code
+        response = self.app.get("/death/bob/")#year has invalid input ("bob")
+        self.assertEqual(response.status_code, 403)
+
+        # convert the response data from json and call the asserts
+
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 403, "msg": "Input has to be digits for year"})
+
 
     def test_INVALID_MONTH_INPUT_for_year_month_fetch(self):
         # send the request and check the response status code
@@ -145,5 +176,4 @@ class TestResourceGathering(unittest.TestCase):
 
         body = json.loads(str(response.data, "utf8"))
         self.assertDictEqual(body, {"code": 404, "msg": "There is no information for that date"})
-
 

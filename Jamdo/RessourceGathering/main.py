@@ -14,6 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 ##from models import db, row2dict, API
 
 
+# url format to query for wiki page
 url = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1" \
       "&titles="
 URL = "https://en.wikipedia.org/w/api.php"
@@ -22,26 +23,32 @@ monthDict = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: '
              7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
 
 
+# handling on invalid routes
 @app.errorhandler(404)
 def page_not_found(e):
     return make_response(jsonify({"code": 404, "msg": "404: Not Found"}), 404)
 
 
+# default route
 @app.route('/')
 def resource_gathering():
     return jsonify({"microservice": "resource gathering"})
 
-# CAN ONLY SEARCH FROM 1900 to NOW
+# YEARS CAN ONLY SEARCH FROM 1900 to 2018
 
 
-# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected day in month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/<day>', methods={"GET"})
+# RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected DAY in MONTH of YEAR in JSON format
+@app.route('/<string:event_type>/<year>/<month>/<day>', methods={"GET"})
 def return_event_day(event_type, year, month, day):
 
-        location = request.args.get("location")
-
         type = 0
-        if int(year) < 1900 or int(year) > 2018 or month > 12 or month < 1 or int(day) > 31 or int(day) < 1:
+        # Check to see if input are digits
+        if not year.isdigit() or not str(month).isdigit() or not day.isdigit():
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Input has to be digits for year, month, day"}), 403)
+
+        # Check the values for year, month and day. Makes sure they are between the valid values
+        if int(year) < 1900 or int(year) > 2018 or int(month) > 12 or int(month) < 1 or int(day) > 31 or int(day) < 1:
             return make_response(jsonify({"code": 403,
                                           "msg": "Wrong input of Year, Month or Day"}), 403)
         if event_type == "event":
@@ -59,39 +66,29 @@ def return_event_day(event_type, year, month, day):
             return make_response(jsonify({"code": 403,
                                           "msg": "There needs to be an event_type"}), 403)
 
-        # if not location:
-        #     result = output_data(year, month, day, type)
-
+        month = int(month)
+        day = int(day)
         result = output_data(year, month, day, type)
 
         key = str(year) + " " + monthDict[month]+ " " + str(day)
 
-        # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
-        # res = r.post(cache_url, data=result)
-        # make_response(jsonify({key: result[key]}))
-        # return make_response(jsonify({"code": 403,
-        #                               "msg": "There is no information for that date"}), 403)
-
         if key in result:
-            # cache_url = "http://127.0.0.1:5000/" + year + "/" + str(month) + "/" + day + "/"
-            r = requests.Session()
             return make_response(jsonify({key: result[key]}))
         else:
             return make_response(jsonify({"code": 404,
                                           "msg": "There is no information for that date"}), 403)
-    # If search query in cache
 
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
-@app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
+@app.route('/<string:event_type>/<year>/<month>/', methods={"GET"})
 def return_event_month(event_type, year, month):
 
-
-    # If search query not in cache
-
-        location = request.args.get("location")
+        # Check to see if input are digits
+        if not year.isdigit() or not month.isdigit():
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Input has to be digits for year, month"}), 403)
         type = 0
-        if int(year) < 1900 or int(year) > 2018 or month > 12 or month < 1:
+        if int(year) < 1900 or int(year) > 2018 or int(month) > 12 or int(month) < 1:
             return make_response(jsonify({"code": 403,
                                           "msg": "Year has to be between 1900 and 2018. Month from 1 to 12"}), 403)
         if event_type == "event":
@@ -108,11 +105,9 @@ def return_event_month(event_type, year, month):
         else:
             return make_response(jsonify({"code": 403,
                                           "msg": "There needs to be an event_type"}), 403)
-        if not location:
-            result = output_data(year, month, 0, type)
-        result = output_data(year, month, 0, type)
 
-        result1 = json.dumps(result)
+        month = int(month)
+        result = output_data(year, month, 0, type)
 
         return make_response(jsonify(result))
 
@@ -121,10 +116,11 @@ def return_event_month(event_type, year, month):
 @app.route('/<string:event_type>/<year>/', methods={"GET"})
 def return_event_year(event_type, year):
 
-
-        location = request.args.get("location")
         type = 0
-        if int(year) <1900 or int(year) > 2018:
+        if not year.isdigit():
+            return make_response(jsonify({"code": 403,
+                                          "msg": "Input has to be digits for year"}), 403)
+        if int(year) < 1900 or int(year) > 2018:
             return make_response(jsonify({"code": 403,
                                           "msg": "Year has to be between 1900 and 2018"}), 403)
         if event_type == "event":
@@ -142,21 +138,17 @@ def return_event_year(event_type, year):
             return make_response(jsonify({"code": 403,
                                           "msg": "There needs to be an event_type"}), 403)
 
-        if not location:
-            result = output_data(year, 1, 0, type)
-        result = output_data(year, 1, 0, 1) ## for january
+        result = output_data(year, 1, 0, 1) # for january
+        # starts from january for the year and then adds all other months of the year
         for i in range(2, 13):
             nextMonth = output_data(year, i, 0, type)
-            ##print(nextMonth)
             if nextMonth:
                 result.update(nextMonth)
-        result1 = json.dumps(result)
 
         return make_response(jsonify(result))
-    # If search query in cache
 
 
-# did not use this feature in the project
+# did not use this feature in the project ( would return top movies for the year)
 @app.route('/movie/top/<int:number>', methods={"GET"})
 def return_top_movies(number):
     if number <= 0 or number > 200:
@@ -167,10 +159,6 @@ def return_top_movies(number):
 
 
 # -------------------------     END SETUP SECTION   ------------------------------------------------------------
-
-#register server with Auth Server
-from authentication import getAuthToken
-APPLICATION_AUTH_TOKEN = getAuthToken(app.config['SERVER_AUTH_NAME'],app.config['SERVER_AUTH_PASSWORD'])
 
 if __name__ == '__main__':
     app.run(debug=True, port=app.config['SERVER_PORT'])
