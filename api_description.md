@@ -25,7 +25,7 @@ ex. `http://www.JAMDO.com/api/2002/10/28?location=Berlin,Germany`
 |----------------------|----------------------|-----------------------------------------|
 | return_event_day     | GET /event_type/year/month/day  | Return all information on that day from wiki in json format  |
 | return_event_month   | GET /event_type/year/month/ | Return all information on that month from wiki in json format |
-| return_event_year    | POST /event_type/year/    | Return all information on that year from wiki in json format     |
+| return_event_year    | GET /event_type/year/    | Return all information on that year from wiki in json format     |
 
 
 Example: Getting the event_type information for a specific day<br />
