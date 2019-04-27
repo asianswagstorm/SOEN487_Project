@@ -39,11 +39,11 @@ Contributors:
 
 
 Tasks breakdown, responsibilities:
-- James Edwards: Caching server
-- Andy Nguyen: Authentication server, Application Server
-- Manuel Toca: Caching server
-- Nguyen Dinh: Authentication server, Application Server
-- Olivier Mercier Peetz: Resource Gathering Server
+- James Edwards: Caching server, Testing, Presentation
+- Andy Nguyen: Authentication server, Application Server, Testing, Presentation
+- Manuel Toca: Caching server, Testing, Presentation
+- Nguyen Dinh: Authentication server, Application Server, Testing, Presentation
+- Olivier Mercier Peetz: Resource Gathering Server, Testing
 
 
 Known issues, bugs:
