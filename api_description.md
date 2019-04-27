@@ -37,7 +37,7 @@ Method : return_event_day<br />
   event : historical event(s) that happened that date <br />
   birth : birth(s) that happened that date <br />
   death : deaths(s) that happened that date <br />
-  input example : /birth/1948/1/2 (do not put 01/02 for month and date) 
+  input example : /birth/1948/1/2 
   
 
 
