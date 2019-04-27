@@ -8,26 +8,21 @@ The application utilizes four microservices to manage the resources and data it 
 
 
 Installation Instructions:
-
-
-
-Instructions to run:
-
-1)go into authentication folder
-  run command 
-  python main.py
+1. Go into authentication folder
+   run command
+   python main.py
   
-2)go into resource gathering folder
-  run command
-  python main.py
+2. Go into resource gathering folder
+   run command
+   python main.py
   
-3)go into caching folder
-  run command 
-  python main.py 
+3. Go into caching folder
+   run command
+   python main.py
   
-4)go into Jamdo folder
-  run command
-  python main.py
+4. Go into Jamdo folder
+   run command
+   python main.py
 
 
 Contributors:
