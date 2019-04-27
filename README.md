@@ -30,6 +30,9 @@ Tasks breakdown, responsibilities:
 
 
 Known issues, bugs:
+- Cache system does not consider updated Wiki information
+- Some dates do not return any information
+- Returned information formatting can be messy
 
 
 
