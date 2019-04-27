@@ -32,7 +32,10 @@ Tasks breakdown, responsibilities:
 Known issues, bugs:
 - Cache system does not consider updated Wiki information
 - Some dates do not return any information
+- There is no information for Years before 1900 and after 2018
+- There is no information for births after 2001
 - Returned information formatting can be messy
+
 
 
 
