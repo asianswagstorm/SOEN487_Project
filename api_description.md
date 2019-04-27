@@ -54,7 +54,7 @@ Method : return_event_day<br />
 
 ## Technical Microservice Description:
 #### 1. Resource Gathering Server
-- This microservice responds to HTTP requests describing a date and location. Given these parameters predetermined 3rd party APIs will be queried to generate a list of interesting information. Authenticated requests will signal to the service that the request was made by the caching system. 
+- This microservice responds to HTTP requests describing a date. Given these parameters predetermined 3rd party APIs will be queried to generate a list of interesting information. Authenticated requests will signal to the service that the request was made by the caching system. 
 
 | Request | Response                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
