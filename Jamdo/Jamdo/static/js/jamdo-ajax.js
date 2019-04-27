@@ -39,8 +39,9 @@ function getNewDate(){
       return false;
     }
     httpRequest.onreadystatechange = alertContents;
-    rand = Math.floor(Math.random() * (100 - 1) + 1)
-    httpRequest.open('GET', 'https://jsonplaceholder.typicode.com/comments?postId=' + rand);
+    rand = Math.floor(Math.random() * (100 - 1) + 1);
+    //httpRequest.open('GET', 'https://jsonplaceholder.typicode.com/comments?postId=' + rand);
+    httpRequest.open('GET', '/getRandom');
     httpRequest.send();
   }
 
@@ -48,7 +49,10 @@ function getNewDate(){
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
       if (httpRequest.status === 200) {
         toggleLoader();
-        content.innerHTML += httpRequest.responseText;
+        let output = JSON.parse(httpRequest.responseText);
+        let year = output[0]['Year'];
+        let event = output[0]['event'].replace(/[^\w\s&]+/g,' ').replace(/[&]/g,'\n');
+        content.innerHTML += "<div class='moreJamdo'><h3>"+year+"</h3><pre>"+event+"</pre></div>";
       } else {
         toggleLoader();
         content.innerHTML += 'Error: There was a problem with the request.';

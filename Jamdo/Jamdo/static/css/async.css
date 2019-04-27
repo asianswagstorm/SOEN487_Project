@@ -17,6 +17,15 @@
   border-color: #1079bf transparent #1079bf transparent;
   animation: lds-dual-ring 1.2s linear infinite;
 }
+.moreJamdo::before{
+  content:'MORE JAMDO!';
+  color:#1079bf;
+  display: block;
+}
+.moreJamdo{
+  margin:20px;
+  color: white;
+}
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg);

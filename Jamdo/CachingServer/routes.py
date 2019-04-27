@@ -5,6 +5,7 @@ from flask import jsonify, json
 
 import datetime
 import sqlalchemy
+import random
 
 from models import db, Result, row2dict
 from main import app
@@ -19,6 +20,15 @@ def page_not_found(e):
 def soen487_a1():
     return jsonify({"microservice": "Caching Server"})
 
+@app.route('/getRandom')
+def getRandom():
+    num_rows = db.session.query(Result).count()
+    rand = random.randrange(0, db.session.query(Result).count()) 
+    random_entry = db.session.query(Result)[rand]
+    if(random_entry):
+        return make_response(jsonify({'Year':random_entry.year,'event':random_entry.event}), 200)
+    else:
+        return make_response(jsonify({'message':'No Events Found'}), 200)
 
 # DUMP entire database
 @app.route('/showDatabase', methods={"GET"})

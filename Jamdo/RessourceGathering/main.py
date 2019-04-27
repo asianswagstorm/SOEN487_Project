@@ -190,5 +190,9 @@ def return_top_movies(number):
 
 # -------------------------     END SETUP SECTION   ------------------------------------------------------------
 
+#register server with Auth Server
+from authentication import getAuthToken
+APPLICATION_AUTH_TOKEN = getAuthToken(app.config['SERVER_AUTH_NAME'],app.config['SERVER_AUTH_PASSWORD'])
+
 if __name__ == '__main__':
     app.run(debug=True, port=app.config['SERVER_PORT'])

@@ -177,6 +177,10 @@ def login():
         # return jsonify({'token' : token.decode('UTF-8')})
         return make_response(render_template('homepage.html', fname = fname , lname = lname, username=username), 200)
 
+@app.route('/getRandom', methods=['GET'])
+def getRandom():
+    cached_random = requests.Session().get('http://localhost:5000/getRandom')
+    return make_response(jsonify(cached_random.json(),200))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
