@@ -6,6 +6,23 @@ import jwt, datetime, time, requests, re
 
 from main import app, bcrypt, APPLICATION_AUTH_TOKEN as SERVER_TOKEN
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return make_response(jsonify({"code": 404, "msg": "404: Not Found"}), 404)
+
+@app.errorhandler(401)
+def incorrect_password(e):
+    return make_response(jsonify({"code": 401, "msg": "401: Incorrect password"}), 401)
+
+@app.errorhandler(422)
+def incorrect_password(e):
+    return make_response(jsonify({"code": 422, "msg": "422: Input Missing"}), 422)
+
+@app.errorhandler(500)
+def username_already_exists(e):
+    return make_response(jsonify({"code": 500, "msg": "500: Username already exists"}), 500)    
+
+
 @app.route('/', methods=['GET', 'POST'])
 def getJAMDO():
     httpMethod = request.method
@@ -151,7 +168,7 @@ def login():
 
         if (not username or not password):
             flash("Missing at least one input fields", "danger")
-            return make_response(render_template('login.html', inputError="Login"), 500)
+            return make_response(render_template('login.html', inputError="Login"), 422)
 
         if (User.query.filter_by(username=username).first() is None):
             flash("User " + username + " not found in DB", "danger")
@@ -200,7 +217,7 @@ def register():
                 max_id = i.id
         if not username or not password or username == "" or password == "":
             flash("Variable missing, please enter username or password", "danger")
-            return make_response(render_template('register.html', inputError="Register"), 404)
+            return make_response(render_template('register.html', inputError="Register"), 422)
 
         if (not User.query.filter_by(username=username).first() is None):
             flash("Username already exists", "danger")

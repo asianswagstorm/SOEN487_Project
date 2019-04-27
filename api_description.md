@@ -23,25 +23,22 @@ ex. `http://www.JAMDO.com/api/2002/10/28?location=Berlin,Germany`
 
 | Methods              | HTTP   Request       |            Description                  |
 |----------------------|----------------------|-----------------------------------------|
-| getResourceInfo     | GET /resources/     | Return resource info by resource id   |
-| getDataFromResource | GET /resources/data | return matching data from resource API |
-| addResourcerInfo    | POST /resources/    | Insert resource information            |
-| resourceUpdateInfo  | PUT /resource/      | Edit resource profile                  |
-
-Example: Adding wikipedia as ressource and getting information<br />
+| return_event_day     | GET /event_type/year/month/day  | Return all information on that day from wiki in json format  |
+| return_event_month   | GET /event_type/year/month/ | Return all information on that month from wiki in json format |
+| return_event_year    | GET /event_type/year/    | Return all information on that year from wiki in json format     |
 
 
-Method : addRessourceInfo<br />
-  name of ressource : Wikipedia (ID:1)<br />
-  endpoint:  http://en.wikipedia.org/w/api.php <br />
-  action=query  //to fetch data from wiki<br />
-  list=search   //to get list of pages matching a criteria<br />
-  srsearch=      //along with a page title to search for<br />
-  format=jsonfm   //recommended format for output<br />
+Example: Getting the event_type information for a specific day<br />
+
+
+Method : return_event_day<br />
+  route : /event_type/year/month/day<br />
+  event_type:  can be event, birth or death <br />
+  event : historical event(s) that happened that date <br />
+  birth : birth(s) that happened that date <br />
+  death : deaths(s) that happened that date <br />
+  input example : /birth/1948/1/2 (do not put 01/02 for month and date) 
   
-Method : getDataFromRessource       /ressource/data      data=John
-Queries wikipedia API for John
-http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=jsonfm
 
 
 ### Micro Service 2: Authentication Oauth2 and JWT<br/>
@@ -61,15 +58,15 @@ http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=John&format=
 
 | Request | Response                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
-| GET /:Year/:Month/:Day?Location=Location         | 200 JSON                  | Formatted JSON response of 3rd party API data                 |
-| GET /:Year/:Month/:Day?Location=Location  (**Authenticated**)        | POST -> Cache Server           | Store processed 3rd party API data       |
+| GET /:Year/:Month/:Day         | 200 JSON                  | Formatted JSON response of 3rd party API data                 |
+| GET /:Year/:Month/:Day  (**Authenticated**)        | POST -> Cache Server           | Store processed 3rd party API data       |
 
 #### 2. Data Persistance/Caching Server
 - The Caching Server describes the state of the persistant data retrieved from the Resource Server. Dates not present in the database are expected to be populated by the Resource Server.
 
 | Request | Response                       | Description                                      |
 |-------------|---------------------------|--------------------------------------------------|
-| GET /:Year/:Month/:Day?Location=Location         | 200 JSON                  | Query of data in database                 |
+| GET /:Year/:Month/:Day         | 200 JSON                  | Query of data in database                 |
 | POST (**Authenticated**)        | 200 JSON, POST -> Application Server          |Response of successful data store, Signals newly saved| 
 
 #### 3. Authentication Server

@@ -13,7 +13,7 @@ from auth import *										#encode, decode, protected endpoint
 								
 @app.route('/',methods=["GET"])
 def root():
-	return response(message="Hello World")
+	return jsonify({"microservice": "Authentication Server"})
 
 @app.route('/showDatabase',methods=["GET"])
 def showData():
