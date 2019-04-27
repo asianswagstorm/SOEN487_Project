@@ -98,66 +98,27 @@ class TestResult(unittest.TestCase):
 
     def test_post_event_year_without_year(self):
         # send the request and check the response status code
-        response = self.app.post("/isCached/birth/")
+        response = self.app.post("/isCached/birth//")
         self.assertEqual(response.status_code, 404)
 
         # convert the response data from json and call the asserts
         body = json.loads(str(response.data, "utf8"))
         self.assertDictEqual(body, {"code": 404, "msg": "404: Not Found"})
 
-    # def test_post_event_year_with_year(self):
-    #     # do we really need to check counts?
-    #     initial_count = Result.query.filter_by(name="Dan").count()
-    #
-    #     # send the request and check the response status code
-    #     response = self.app.post("/isCached/birth/1990/")
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     # convert the response data from json and call the asserts
-    #     body = json.loads(str(response.data, "utf8"))
-    #     self.assertDictEqual(body, {"code": 200, "msg": "success"})
-    #
-    #     # check if the DB was updated correctly
-    #     updated_count = Result.query.filter_by(name="Dan").count()
-    #     self.assertEqual(updated_count, initial_count + 1)
+    def test_post_event_month_without_year(self):
+        # send the request and check the response status code
+        response = self.app.post("/isCached/birth//1/")
+        self.assertEqual(response.status_code, 404)
 
-    # def test_post_event_month_without_year(self):
-    #     # send the request and check the response status code
-    #     response = self.app.post("/isCached/birth//1/")
-    #     self.assertEqual(response.status_code, 403)
-    #
-    #     # convert the response data from json and call the asserts
-    #     body = json.loads(str(response.data, "utf8"))
-    #     self.assertDictEqual(body, {"code": 403, "msg": "Cannot post event. Missing mandatory fields."})
-    #
-    # def test_post_event_month_with_year(self):
-    #     # do we really need to check counts?
-    #     initial_count = Result.query.filter_by(name="Dan").count()
-    #
-    #     # send the request and check the response status code
-    #     response = self.app.post("/isCached/birth/1990/1/")
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     # convert the response data from json and call the asserts
-    #     body = json.loads(str(response.data, "utf8"))
-    #     self.assertDictEqual(body, {"code": 200, "msg": "success"})
-    #
-    #     # check if the DB was updated correctly
-    #     updated_count = Result.query.filter_by(name="Dan").count()
-    #     self.assertEqual(updated_count, initial_count + 1)
-    #
-    # def test_post_event_day(self):
-    #     # do we really need to check counts?
-    #     initial_count = Result.query.filter_by(id="1").count()
-    #
-    #     # send the request and check the response status code
-    #     response = self.app.post("/isCached/birth/1990/1/1/")
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     # convert the response data from json and call the asserts
-    #     body = json.loads(str(response.data, "utf8"))
-    #     self.assertDictEqual(body, {"code": 200, "msg": "success"})
-    #
-    #     # check if the DB was updated correctly
-    #     updated_count = Result.query.filter_by(id=1).count()
-    #     self.assertEqual(updated_count, initial_count)
+        # convert the response data from json and call the asserts
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 404, "msg": "404: Not Found"})
+
+    def test_post_event_day_without_year(self):
+        # send the request and check the response status code
+        response = self.app.post("/isCached/birth//1/1/")
+        self.assertEqual(response.status_code, 404)
+
+        # convert the response data from json and call the asserts
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 404, "msg": "404: Not Found"})
