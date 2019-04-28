@@ -47,7 +47,7 @@ def return_event_day(event_type, year, month, day):
     location = request.args.get("location")
 
     type = 0
-    if int(year) < 1900 or int(year) > 2018:
+    if int(year) < 1900 or int(year) > 2018 or month < 1 or month > 12 or int(day) < 1 or int(day) > 31:
         return make_response(jsonify({"code": 403,
                                       "msg": "Year has to be between 1900 and 2018"}), 403)
     if event_type == "event":
@@ -61,13 +61,13 @@ def return_event_day(event_type, year, month, day):
         type = 3
         if int(year) >= 2002:
             type = 2
-        else:
-            return make_response(jsonify({"code": 403,
+    else:
+        return make_response(jsonify({"code": 403,
                                       "msg": "There needs to be an event_type"}), 403)
 
     # if not location:
     #     result = output_data(year, month, day, type)
-
+    day = int(day)
     result = output_data(year, month, day, type)
 
     key = str(year) + " " + monthDict[month]+ " " + str(day)
@@ -90,6 +90,7 @@ def return_event_day(event_type, year, month, day):
     # else:
     #     return jsonify(cache_response.json())
         #return "There already"
+
 
 # RETURNS ALL HISTORICAL EVENTS OR DEATHS OR BIRTHS for selected month of year in JSON format
 @app.route('/<string:event_type>/<year>/<int:month>/', methods={"GET"})
