@@ -119,7 +119,7 @@ JAMDO was alpha tested on the Heroku PaaS and later updated to the build to be s
 
 | Server         | domain                                  |
 |----------------|-----------------------------------------|
-| Applcation     | jamdo-487.herokuapp.com                 |
+| Application     | jamdo-487.herokuapp.com                 |
 | Resource       | resource-server-487.herokuapp.com       |
 | Caching        | cache-server-487.herokuapp.com          |
 | Authentication | authentication-server-487.herokuapp.com |
