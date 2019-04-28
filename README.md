@@ -107,6 +107,8 @@ Heroku limits the bandwidth and *sleeps* the application if not in use for more 
 
 Specific changes were made to each microservice to be deployed to Heroku. Firstly, all localhost addresses and ports were changed to the subdomain registered with Heroku. Next, a linux based HTTP server *gunicorn* module was added to the requirements.txt of all servers. This is a specific module required to run the Flask application on the Heroku servers. Finally, a Procfile was added to the root of the server directory to instruct the platform to execute gunicorn and run the application from main.py
 
+Errors may occur when registering a username that already exists or logging with an non existing account, this however does not occur in the local version. As message flashing was not included in the deployed version.
+
 https://jamdo-487.herokuapp.com 
 
 ## Known issues and bugs:
@@ -148,6 +150,9 @@ https://devcenter.heroku.com/articles/getting-started-with-python
 ## Installation Instructions:
 Each server exists in its own directory with the required dependencies and modules existing in *requirements.txt*. 
 To start any server, main.py contains the run protocol. The entire application requires that the authentication server starts before the others as they request registration to gain an authentication token. 
+
+Go into each individual folder and type python main.py in the git bash command line or in the command prompt assuming python exists in the environment settings.
+
 ## Contributors:
 - James Edwards, jamesedwards1394@gmail.com
 - Andy Nguyen, nguyen.andy123@gmail.com
