@@ -64,8 +64,8 @@ def return_event_day(event_type, year, month, day):
         #               13: 'Nobel Prizes'}
         # month_name = month_dict[month]
 
-        data = request.data
-        events = json.dumps(data)
+        data = request.get_data()
+        data = data.decode('utf8').replace('([+&%])', " ")
         # events = json.loads(data)
 
         # if not month and not day:
@@ -77,7 +77,7 @@ def return_event_day(event_type, year, month, day):
         # else:
         #     r = Result(year=year, month=month_name, day=day, event=event)
 
-        r = Result(year=year, month=month, day=day, type=event_type, event=events)
+        r = Result(year=year, month=month, day=day, type=event_type, event=data)
         db.session.add(r)
         try:
             db.session.commit()
@@ -114,15 +114,15 @@ def return_event_month(event_type, year, month):
         #
         # month_name = month_dict[month]
 
-        data = request.data
-        events = json.dumps(data)
+        data = request.get_data()
+        data = data.decode('utf8').replace('([+&%])', " ")
 
         # if not month:
         #     r = Result(year=year, event=event)
         # else:
         #     r = Result(year=year, month=month_name, event=event)
 
-        r = Result(year=year, month=month, type=event_type, event=events)
+        r = Result(year=year, month=month, type=event_type, event=data)
 
         db.session.add(r)
         try:
