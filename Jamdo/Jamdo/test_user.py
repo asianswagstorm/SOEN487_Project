@@ -68,9 +68,14 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)       
     
     def test_logout(self): 
-
         response = self.app.get("/logout")
-        self.assertEqual(response.status_code, 200)         
+        self.assertEqual(response.status_code, 200)    
+
+    def test_user_not_Admin(self): 
+        response = self.app.get("/users")
+        self.assertEqual(response.status_code, 401) 
+        body = json.loads(str(response.data, "utf8"))
+        self.assertDictEqual(body, {"code": 401, "msg": "Protected Route only authorized accounts can access this route, Get out of here"})          
     
 if __name__ == '__main__':
     unittest.main()

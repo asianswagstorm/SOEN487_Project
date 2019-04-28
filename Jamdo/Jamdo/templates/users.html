@@ -32,7 +32,9 @@
     </table>
 		  <section>
 					<header class="major">
-						<a href="#" class="button medium">{% include "includes/__messages__.html "%}</a>
+                        {% if inputError %}
+						<a href="users" class="button medium">{% include "includes/__messages__.html "%}</a>
+                        {% endif %}
 						<h2>Delete User By ID or By Username</h2>
 					</header>
 					<form method="post" action="#">

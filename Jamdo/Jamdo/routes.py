@@ -238,28 +238,45 @@ def logout():
     return render_template('homepage.html')
 
 
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST']) #protected route only for admin to manage the users
 def displayUsers():
-    if request.method == "GET":
-        return render_template('users.html', users=User.query.all())
+
+    if (request.method == "GET") :
+        if ('username' in session)  and (session["username"] == 'Admin'):
+         username =  session["username"]  
+         return render_template('users.html', users=User.query.all(), username=username)  
+        else:
+             return make_response(jsonify({"code": 401,
+                                      "msg": "Protected Route only authorized accounts can access this route, Get out of here"}), 401) 
     else:
         user_id = request.form["id_number"]
-        username = request.form["u"]
-        if not user_id and not username:
+        Username_Input = request.form["u"]
+        if not user_id and not Username_Input:
             flash("Invalid Field", "danger")
-            return render_template('users.html', users=User.query.all())
-
-        elif user_id is not None and not user_id == "":
+            return render_template('users.html', users=User.query.all() , inputError="User", username=session["username"] )
+        
+        #delete by id
+        if user_id is not None and not user_id == "": 
             id_to_delete = User.query.filter_by(id=user_id).first()
-            db.session.delete(id_to_delete)
-        elif username is not None and not username == "":
-            user_to_delete = User.query.filter_by(username=username).first()
-            db.session.delete(user_to_delete)
-        elif username is not None and user_id is not None:
-            id_to_delete = User.query.filter_by(id=user_id).first()
-            user_to_delete = User.query.filter_by(username=username).first()
-            db.session.delete(id_to_delete)
-            db.session.delete(user_to_delete)
-
+            if (id_to_delete == "1") or (user_id == "1") :
+             flash("Cannot Delete Admin ", "danger")
+             return render_template('users.html', users=User.query.all() , inputError="User", username=session["username"] )
+            if id_to_delete is None:
+             flash("ID number not in DB ", "danger")
+             return render_template('users.html', users=User.query.all() , inputError="User", username=session["username"] )
+            elif not id_to_delete == "1":
+             db.session.delete(id_to_delete)
+        #delete by username
+        if Username_Input is not None and not Username_Input == "":
+            user_to_delete = User.query.filter_by(username=Username_Input).first()
+            if (user_to_delete == session["username"]) or (Username_Input == session["username"]) :
+             flash("Cannot Delete Admin ", "danger")
+             return render_template('users.html', users=User.query.all() , inputError="User", username=session["username"] )
+            if user_to_delete is None :
+             flash("Username not in DB ", "danger")
+             return render_template('users.html', users=User.query.all() , inputError="User", username=session["username"] )
+            elif not user_to_delete == session["username"]:
+             db.session.delete(user_to_delete)
+  
         db.session.commit()
-        return render_template('users.html', users=User.query.all())
+        return render_template('users.html', users=User.query.all(), username=session["username"] )
