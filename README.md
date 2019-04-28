@@ -40,7 +40,7 @@ Known issues, bugs:
 
 
 Other comments:
-
+-User Login and Registration do not work on the Heroku Live App, but they work locally. 
 
 
 
