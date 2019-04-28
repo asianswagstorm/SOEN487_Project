@@ -1,6 +1,6 @@
 import unittest
 import json
-from main import app as tested_app
+from tests.test_main import app as tested_app
 from config import TestConfig
 
 
@@ -13,9 +13,8 @@ class TestResourceGathering(unittest.TestCase):
         # nothing to set up
         self.app = tested_app.test_client()
 
-
     def tearDown(self):
-        #nothing to tear down
+        # nothing to tear down
         print("one done")
 
     # ------------------ GET TESTS STARTS ------------------------------
