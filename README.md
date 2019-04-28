@@ -154,11 +154,11 @@ To start any server, main.py contains the run protocol. The entire application r
 Go into each individual folder and type python main.py in the git bash command line or in the command prompt assuming python exists in the environment settings.
 
 ## Contributors:
-- James Edwards, jamesedwards1394@gmail.com
-- Andy Nguyen, nguyen.andy123@gmail.com
-- Manuel Toca, manueltoca03@gmail.com
-- Nguyen Dinh, ngd253@mail.usask.ca
-- Olivier Mercier Peetz, oliviermercierpeetz@live.ca
+- James Edwards, jamese1394, jamesedwards1394@gmail.com
+- Andy Nguyen, asianswagstorm, nguyen.andy123@gmail.com
+- Manuel Toca, mtoca, manueltoca03@gmail.com
+- Nguyen Dinh, Dinher, ngd253@mail.usask.ca
+- Olivier Mercier Peetz, kothve, oliviermercierpeetz@live.ca
 ## Tasks breakdown and responsibilities:
 - James Edwards: Caching server, Testing, Presentation
 - Andy Nguyen: User Login/Registration, Application Server, Testing, Presentation
