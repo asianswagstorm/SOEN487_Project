@@ -1,25 +1,4 @@
 JAMDO
-## Project description:
-
-Our web application leverages information retrieval returning engaging and compelling information based on the date of an event. Given the date and event type, the application will search and return a wide variety of relevant information to display to the user. A web crawler will be required to search and gather for information based on user inputs. This will entail utilizing existing 3rd party APIs as an efficient way of retrieving specific data. To optimize the web crawling, reduce requests, and lower wait times, previously searched information will be saved in persistent data. The managing of persistent data will require the creation of a caching engine to detect, return, and update data in the databases. Finally aside from a users' ability to query data , asynchronous requests will be made to give users an 'infinite scroll'.  Here JAMDO makes background requests to the server for additional dates of information. 
-
-The application utilizes four microservices to manage the resources and data it collects: Resource Gathering of relevant information, Data Caching of previously requested information, Authentication and Registration of servers, and an Application microservice which handles UI, user login, and infinite scroll.
-## Installation Instructions:
-Each server exists in its own directory with the required dependencies and modules existing in *requirements.txt*. 
-To start any server, main.py contains the run protocol. The entire application requires that the authentication server starts before the others as they request registration to gain an authentication token. 
-
-## Contributors:
-- James Edwards, jamesedwards1394@gmail.com
-- Andy Nguyen, nguyen.andy123@gmail.com
-- Manuel Toca, manueltoca03@gmail.com
-- Nguyen Dinh, ngd253@mail.usask.ca
-- Olivier Mercier Peetz, oliviermercierpeetz@live.ca
-## Tasks breakdown and responsibilities:
-- James Edwards: Caching server, Testing, Presentation
-- Andy Nguyen: User Login/Registration, Application Server, Testing, Presentation
-- Manuel Toca: Caching server, Testing, Presentation
-- Nguyen Dinh: Authentication server, Application Server, Testing, Presentation, Deployment
-- Olivier Mercier Peetz: Resource Gathering Server, Testing
 ## Overview
 
 Our web application leverages information retrieval returning engaging and compelling information based on the date of an event, more specifically historical events, deaths or births. Given the date the application will search and return a wide variety of relevant information to display to the user. A web crawler will be required to search and gather for information based on user inputs. This will entail utilizing existing 3rd party APIs as an efficient way of retrieving specific data. To optimize the web crawling, reduce requests, and lower wait times, previously searched information will be saved in persistent data. The managing of persistent data will require the creation of a caching engine to detect, return, and update data in the databases. Finally aside from a users'' ability to query data, asynchronous requests will be made to give users an \'infinite scroll\'. Here JAMDO makes background requests to the server for additional dates of information. The application will utilize four microservices to manage the resources and data it collects; the main application user service, resource gathering of relevant information, data caching of previously requested information, and continuous asynchronous requests.
@@ -165,3 +144,19 @@ https://github.com/pyca/bcrypt/
 http://jinja.pocoo.org/docs/2.10/
 
 https://devcenter.heroku.com/articles/getting-started-with-python
+
+## Installation Instructions:
+Each server exists in its own directory with the required dependencies and modules existing in *requirements.txt*. 
+To start any server, main.py contains the run protocol. The entire application requires that the authentication server starts before the others as they request registration to gain an authentication token. 
+## Contributors:
+- James Edwards, jamesedwards1394@gmail.com
+- Andy Nguyen, nguyen.andy123@gmail.com
+- Manuel Toca, manueltoca03@gmail.com
+- Nguyen Dinh, ngd253@mail.usask.ca
+- Olivier Mercier Peetz, oliviermercierpeetz@live.ca
+## Tasks breakdown and responsibilities:
+- James Edwards: Caching server, Testing, Presentation
+- Andy Nguyen: User Login/Registration, Application Server, Testing, Presentation
+- Manuel Toca: Caching server, Testing, Presentation
+- Nguyen Dinh: Authentication server, Application Server, Testing, Presentation, Deployment
+- Olivier Mercier Peetz: Resource Gathering Server, Testing
