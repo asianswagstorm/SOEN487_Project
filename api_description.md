@@ -45,10 +45,10 @@ Method : return_event_day<br />
 
 | Methods              | HTTP   Request       |            Description                  |
 |----------------------|----------------------|-----------------------------------------|
-| login                | POST auth/login          | Verify login credentials match info in db  |
-| register             | POST auth/register       | Adds the user to database along with a token |
+| login                | POST /login          | Verify login credentials match info in db  |
+| register             | POST /register       | Adds the user to database along with a token |
 | logout               | - /logout            | Deletes the session and clear the token |
-| refreshToken         | GET auth/login           | Get a new access token without having to reauthenticate|
+| users                | GET /users           | A protected page only restricted for Admin to manage users|
 
 
 
